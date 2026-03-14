@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>aufgabe1</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="Aufgabe1_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Aufgabe1_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Aufgabe1_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Aufgabe1_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="Aufgabe1_files/libs/quarto-html/popper.min.js"></script>
+<script src="Aufgabe1_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Aufgabe1_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Aufgabe1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Aufgabe1_files/libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Aufgabe1_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Aufgabe1_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Aufgabe1_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<div id="819558e0" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Aufgabe 1.1.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>listings <span class="op">=</span> pd.read_csv(<span class="st">"Daten/listings_berlin.csv"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Anzahl Zeilen: </span><span class="sc">{</span><span class="bu">len</span>(listings)<span class="sc">}</span><span class="ss"> </span><span class="ch">\n</span><span class="ss">Anzahl Spalten: </span><span class="sc">{</span><span class="bu">len</span>(listings.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>Anzahl_NAs <span class="op">=</span> listings.isna().<span class="bu">sum</span>()</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>Anteil_NAs <span class="op">=</span> listings.isna().mean().<span class="bu">map</span>(<span class="st">"</span><span class="sc">{:.2%}</span><span class="st">"</span>.<span class="bu">format</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>Table_1_1 <span class="op">=</span> pd.DataFrame({<span class="st">"Anzahl NAs"</span>:Anzahl_NAs, <span class="st">"Anteil NAs"</span>:Anteil_NAs})</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>Table_1_1.head(<span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Anzahl Zeilen: 14274 
+Anzahl Spalten: 20</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Anzahl NAs</th>
+<th data-quarto-table-cell-role="th">Anteil NAs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">price</th>
+<td>5010</td>
+<td>35.10%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">neighbourhood_cleansed</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">latitude</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">longitude</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">room_type</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">bedrooms</th>
+<td>2024</td>
+<td>14.18%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">bathrooms_text</th>
+<td>16</td>
+<td>0.11%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">accommodates</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">amenities</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">host_since</th>
+<td>14</td>
+<td>0.10%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">host_is_superhost</th>
+<td>164</td>
+<td>1.15%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">host_listings_count</th>
+<td>14</td>
+<td>0.10%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">host_response_rate</th>
+<td>5018</td>
+<td>35.15%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">review_scores_rating</th>
+<td>3314</td>
+<td>23.22%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">review_scores_cleanliness</th>
+<td>3314</td>
+<td>23.22%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">number_of_reviews</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">reviews_per_month</th>
+<td>3314</td>
+<td>23.22%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">minimum_nights</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">availability_365</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">instant_bookable</th>
+<td>0</td>
+<td>0.00%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="07bee3fc" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Aufagbe 1.2</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Die Tabelle aus Aufgabe 1_1 wird nach den Werten in Spalte "Anteil NAs" in "descending"-order sortiert. </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Es werden nur die obersten drei Werte angezeigt. </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Die folgenden drei Werte haben die höchste Rate an fehlenden Werten:"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>Table_1_1.sort_values(<span class="st">"Anteil NAs"</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Die folgenden drei Werte haben die höchste Rate an fehlenden Werten:</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Anzahl NAs</th>
+<th data-quarto-table-cell-role="th">Anteil NAs</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">host_response_rate</th>
+<td>5018</td>
+<td>35.15%</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">price</th>
+<td>5010</td>
+<td>35.10%</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">reviews_per_month</th>
+<td>3314</td>
+<td>23.22%</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>placeholder für den Rest von Aufgabe 1_2</p>
+<div id="599dc68a" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Aufgabe 1_3</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Funktion wird definiert, um string-Einträge in numbers-Einträge umzuwandeln.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_price(price_str):</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Diese Funktion wandelt string in numeric um."""</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pd.isna(price_str):</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.nan</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    price_str_clean <span class="op">=</span> <span class="bu">str</span>(price_str).replace(<span class="st">"$"</span>, <span class="st">""</span>).replace(<span class="st">','</span>, <span class="st">''</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        price_number <span class="op">=</span> <span class="bu">float</span>(price_str_clean)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> price_number <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> price_number</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> np.nan</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.nan</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#Nun wenden wir es auf die gesamte Spalte "price" an.</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>listings_1_3 <span class="op">=</span> listings.copy()</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>listings_1_3[<span class="st">"price"</span>] <span class="op">=</span> listings_1_3[<span class="st">"price"</span>].<span class="bu">apply</span>(clean_price)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>listings_1_3[<span class="st">"price"</span>].describe().loc[[<span class="st">'min'</span>, <span class="st">'50%'</span>, <span class="st">'mean'</span>, <span class="st">'max'</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>min         5.000000
+50%       104.000000
+mean      201.240393
+max     50000.000000
+Name: price, dtype: float64</code></pre>
+</div>
+</div>
+<div id="6e0257ef" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Aufgabe 1.4</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>listings_1_4 <span class="op">=</span> listings_1_3.copy()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Zunächst schauen wir, welche einzigartigen Einträge es gibt mit:</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#listings_1_4["bathrooms_text"].unique()</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Wir wollen nun die Textdarstellung der Bädersituationen umwandeln in eine numerische Form.</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Regel 1: Die Spezifikation eines "Privaten" Bades ist redundant.</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#Regel 2: Die Information eines "Shared" Bades wird durch eine neue boolean-Spalte "Shared_bath_status" erhalten.</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Regel 3: Ein "Half"-Bad gilt als 0.5 Bad.</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Umsetzung Regel 2:</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>listings_1_4[<span class="st">"Shared_bath_status"</span>] <span class="op">=</span> listings_1_4[<span class="st">"bathrooms_text"</span>].<span class="bu">str</span>.contains(<span class="st">"shared"</span>, case<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">#Umsetzung Regel 3:</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>listings_1_4[<span class="st">"bathrooms_text"</span>] <span class="op">=</span> listings_1_4[<span class="st">"bathrooms_text"</span>].<span class="bu">str</span>.replace(<span class="st">"Half-Bath"</span>, <span class="st">"0.5"</span>, case<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">#Umsetzung der Umwandlung zu Numerisch unter Beachtung der Regel 1:</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>listings_1_4[<span class="st">"bathrooms_text"</span>] <span class="op">=</span> pd.to_numeric(</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    listings_1_4[<span class="st">"bathrooms_text"</span>].<span class="bu">str</span>.replace({</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"baths"</span>: <span class="st">""</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"shared"</span>: <span class="st">""</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"private"</span>: <span class="st">""</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bath"</span>: <span class="st">""</span>,</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">" "</span>: <span class="st">""</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    }, case<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>listings_1_4.rename(columns<span class="op">=</span>{<span class="st">"bathrooms_text"</span>:<span class="st">"bathrooms_number"</span>}, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>listings_1_4[[<span class="st">"bathrooms_number"</span>, <span class="st">"Shared_bath_status"</span>]].head()</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listings_1_4.isna().<span class="bu">sum</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>price                        5010
+neighbourhood_cleansed          0
+latitude                        0
+longitude                       0
+room_type                       0
+bedrooms                     2024
+bathrooms_number               16
+accommodates                    0
+amenities                       0
+host_since                     14
+host_is_superhost             164
+host_listings_count            14
+host_response_rate           5018
+review_scores_rating         3314
+review_scores_cleanliness    3314
+number_of_reviews               0
+reviews_per_month            3314
+minimum_nights                  0
+availability_365                0
+instant_bookable                0
+Shared_bath_status              0
+dtype: int64</code></pre>
+</div>
+</div>
+<div id="8f7dcb57" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Aufgabe 1.5</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>listings_1_5 <span class="op">=</span> listings_1_4.copy()</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#Zunächst konvertieren wir "t" zu True und "f" zu False, und NaN auch zu False, da der Standard False ist.</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>listings_1_5[<span class="st">"instant_bookable"</span>] <span class="op">=</span> listings_1_5[<span class="st">"instant_bookable"</span>] <span class="op">==</span> <span class="st">"t"</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>listings_1_5[<span class="st">"host_is_superhost"</span>] <span class="op">=</span> listings_1_5[<span class="st">"host_is_superhost"</span>] <span class="op">==</span> <span class="st">"t"</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#Wir kreieren die Spalte "host_tenure_years" und verwerfen die Spalte "host_since", da die Informationen redundant werden.</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#Datenformat ist egal, da nur das Jahr abgefragt wird.</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>listings_1_5[<span class="st">"host_tenure_years"</span>] <span class="op">=</span> <span class="dv">2025</span> <span class="op">-</span> pd.to_datetime(listings_1_5[<span class="st">"host_since"</span>]).dt.year</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">#Wir droppen die Spalte "host_since".</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>listings_1_5 <span class="op">=</span> listings_1_5.drop(columns<span class="op">=</span><span class="st">"host_since"</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>listings_1_5.columns</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>Index(['price', 'neighbourhood_cleansed', 'latitude', 'longitude', 'room_type',
+       'bedrooms', 'bathrooms_number', 'accommodates', 'amenities',
+       'host_is_superhost', 'host_listings_count', 'host_response_rate',
+       'review_scores_rating', 'review_scores_cleanliness',
+       'number_of_reviews', 'reviews_per_month', 'minimum_nights',
+       'availability_365', 'instant_bookable', 'Shared_bath_status',
+       'host_tenure_years'],
+      dtype='str')</code></pre>
+</div>
+</div>
+<div id="8afcb8ec" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Aufgabe 1.6</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>log_prices <span class="op">=</span> np.log(listings_1_5[<span class="st">"price"</span>])</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>mu_log <span class="op">=</span> np.mean(log_prices)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>sigma_log <span class="op">=</span> np.std(log_prices)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>upper_bound <span class="op">=</span> np.exp(mu_log <span class="op">+</span> <span class="dv">5</span> <span class="op">*</span> sigma_log)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">4</span>))</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>plt.hist(</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    listings_1_5.loc[listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> upper_bound][<span class="st">"price"</span>],</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    log<span class="op">=</span> <span class="va">False</span>, bins <span class="op">=</span> <span class="dv">122</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    density<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    label<span class="op">=</span><span class="st">'empirical density'</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>) <span class="co"># plotting a histogram </span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">"log"</span>)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(upper_bound)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">#Muss noch mit linearer x-Achse dargestellt werden</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>listings_1_5.loc[listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> upper_bound][<span class="st">"price"</span>].dropna().plot(</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    kind<span class="op">=</span><span class="st">"density"</span>,</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"coral"</span>,</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">2</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Price"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Density"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Density Plot of Price"</span>, fontsize<span class="op">=</span><span class="dv">14</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>plt.grid(alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co">#plt.xscale("log")</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="co">#Noch nicht fertig durchdacht</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Aufgabe1_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3214.253030361427</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Aufgabe1_files/figure-html/cell-7-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="1dd06fe2" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Unterbrechung in x-Achse machen</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="ade84bd9" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.6 "preperation" Jan</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">4</span>))</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].hist(listings_1_5[<span class="st">"price"</span>], bins<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_xlabel(<span class="st">"price"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_ylabel(<span class="st">"count"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">"histogramm of all price entries"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].hist(listings_1_5[<span class="st">"price"</span>], bins<span class="op">=</span><span class="dv">50</span>, log<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlabel(<span class="st">"price"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylabel(<span class="st">"count (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(<span class="st">"histogramm of all price entries with log-scaled y"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].hist(listings_1_5.loc[listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> <span class="dv">500</span>][<span class="st">"price"</span>], bins<span class="op">=</span><span class="dv">50</span>, log<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_xscale(<span class="st">"log"</span>)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_xlabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_ylabel(<span class="st">"count"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">2</span>].set_title(<span class="st">"histogramm of price entries &lt;= 500 with log-scaled x"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Aufgabe1_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Erkenntnis: Outlier verzerren das Hist; Outlier (etwa) bei 10000, 40000, und 50000; Preise sind (etwa) log-normalverteilt</p>
+<div id="8f699418" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.6 "main" Jan</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Variante mit Seaborn und zwei Upper Bounds</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>log_prices <span class="op">=</span> np.log(listings_1_5[<span class="st">"price"</span>])</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>mu_log <span class="op">=</span> np.mean(log_prices)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>sigma_log <span class="op">=</span> np.std(log_prices)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>upper_bound <span class="op">=</span> np.exp(mu_log <span class="op">+</span> <span class="dv">5</span> <span class="op">*</span> sigma_log)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>upper_bound_low <span class="op">=</span> np.exp(mu_log <span class="op">+</span> <span class="dv">3</span> <span class="op">*</span> sigma_log)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>n_entries_ub <span class="op">=</span> (listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> upper_bound).<span class="bu">sum</span>()</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>n_entries_ub_low <span class="op">=</span> (listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> upper_bound_low).<span class="bu">sum</span>()</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Upper Bound at sigma level 5: </span><span class="sc">{</span>upper_bound<span class="sc">:.2f}</span><span class="ss">     Upper Bound at sigma level 3: </span><span class="sc">{</span>upper_bound_low<span class="sc">:.2f}</span><span class="ss">"</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of entries at 5-sigma UB: </span><span class="sc">{</span>n_entries_ub <span class="sc">}</span><span class="ss">     Number of entries with 3-sigma UB: </span><span class="sc">{</span>n_entries_ub_low<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots( <span class="dv">2</span>, <span class="dv">2</span>, sharey<span class="op">=</span><span class="va">False</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">7</span>) )</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>sns.histplot( data<span class="op">=</span>listings_1_5.loc[listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> upper_bound], x<span class="op">=</span><span class="st">"price"</span>, kde<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>,<span class="dv">0</span>], log<span class="op">=</span><span class="va">False</span>,  bins<span class="op">=</span><span class="st">"fd"</span>, color<span class="op">=</span><span class="st">"red"</span>, stat<span class="op">=</span><span class="st">"count"</span>)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_xlabel(<span class="st">"price"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_ylabel(<span class="st">"count"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_title(<span class="st">"price distribution with linear scale and 5-sigma UB"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>sns.histplot( data<span class="op">=</span>listings_1_5.loc[listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> upper_bound], x<span class="op">=</span><span class="st">"price"</span>, kde<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>,<span class="dv">1</span>], log<span class="op">=</span><span class="va">False</span>,  bins<span class="op">=</span><span class="st">"fd"</span>, color<span class="op">=</span><span class="st">"navy"</span>, stat<span class="op">=</span><span class="st">"count"</span>) </span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_xlabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_ylabel(<span class="st">"count"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_xscale(<span class="st">"log"</span>)</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_title(<span class="st">"price distribution with logarithmic scale and 5-sigma UB"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>sns.histplot( data<span class="op">=</span>listings_1_5.loc[listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> upper_bound_low], x<span class="op">=</span><span class="st">"price"</span>, kde<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">0</span>], log<span class="op">=</span><span class="va">False</span>,  bins<span class="op">=</span><span class="st">"fd"</span>, color<span class="op">=</span><span class="st">"coral"</span>, stat<span class="op">=</span><span class="st">"count"</span>)</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_xlabel(<span class="st">"price"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_ylabel(<span class="st">"count"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_title(<span class="st">"price distribution with linear scale and 3-sigma UB"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>sns.histplot( data<span class="op">=</span>listings_1_5.loc[listings_1_5[<span class="st">"price"</span>] <span class="op">&lt;=</span> upper_bound_low], x<span class="op">=</span><span class="st">"price"</span>, kde<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">1</span>], log<span class="op">=</span><span class="va">False</span>,  bins<span class="op">=</span><span class="st">"fd"</span>, stat<span class="op">=</span><span class="st">"count"</span>) </span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_xlabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_ylabel(<span class="st">"count"</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_xscale(<span class="st">"log"</span>)</span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_title(<span class="st">"price distribution with logarithmic scale and 3-sigma UB"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Upper Bound at sigma level 5: 3214.25     Upper Bound at sigma level 3: 828.76
+Number of entries at 5-sigma UB: 9240     Number of entries with 3-sigma UB: 9202</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Aufgabe1_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Erklärung: 5-Sigma UB ist statistisch schränkt nur wenig ein =&gt; erhält möglichst viele Infos. 3-Sigma UB ist bewusst etwas einschränkender zur Übersichtlichkeit.</p>
+<p>Vielleicht wären absolute Häufigkeiten doch besser! (Ich habe jetzt absolute genommen)</p>
+<p>Die Bins wurden gemäß der Freedman-Diaconis Regel (die gibt es als bins=“fd” vordefiniert) berechnet.</p>
+<p>Welche Variante eignet sich bessert für statistische Analyse? Idee? log-normalverteilte Daten, typisch für Immoblilien (Quelle?)</p>
+<p>WICHTIG: NOCHMAL CHECKEN, OB DIESE UPPER BOUND-FORMELN SINN MACHEN!!!!!</p>
+<div id="e6e8f4c4" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.7</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>listings_1_7 <span class="op">=</span> listings_1_5.copy()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># group the data by "neighbourhood_cleansed" and calculate the mean, median, count for "price" and mean for "review_scores_rating"</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>table_1_7 <span class="op">=</span>listings_1_7.groupby(<span class="st">"neighbourhood_cleansed"</span>).agg({<span class="st">"price"</span>: [<span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"count"</span>], <span class="st">"review_scores_rating"</span>: <span class="st">"mean"</span>})</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># round the mean values to 2 decimal places and sort the table by the median price in descending order</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>table_1_7 <span class="op">=</span> table_1_7.<span class="bu">round</span>({(<span class="st">"price"</span>,<span class="st">"mean"</span>): <span class="dv">2</span>, (<span class="st">"review_scores_rating"</span>, <span class="st">"mean"</span>): <span class="dv">2</span>}).sort_values((<span class="st">"price"</span>, <span class="st">"median"</span>), ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>table_1_7.head(<span class="dv">3</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="co"># The three most expensive are Haselhorst, West 5, and Schmargendorf.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th colspan="3" data-quarto-table-cell-role="th" data-halign="left">price</th>
+<th data-quarto-table-cell-role="th">review_scores_rating</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">median</th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+</tr>
+<tr class="header">
+<th data-quarto-table-cell-role="th">neighbourhood_cleansed</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Haselhorst</th>
+<td>216.17</td>
+<td>236.5</td>
+<td>6</td>
+<td>4.86</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">West 5</th>
+<td>381.55</td>
+<td>203.0</td>
+<td>11</td>
+<td>4.79</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Schmargendorf</th>
+<td>170.56</td>
+<td>172.0</td>
+<td>34</td>
+<td>4.66</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="b265056a" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.8 </span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> trimmed_mean(x, pct):</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""This function calculates the trimmed mean of a given array x, removing the lowest and highest pct-points of values."""</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> (<span class="bu">isinstance</span>(pct, (<span class="bu">int</span>, <span class="bu">float</span>)) <span class="kw">and</span> <span class="dv">0</span> <span class="op">&lt;=</span> pct <span class="op">&lt;</span> <span class="dv">50</span>): </span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"pct must be a number between 0 and 50"</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> np.asarray(x, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> (<span class="pp">TypeError</span>, <span class="pp">ValueError</span>):</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">TypeError</span>(<span class="st">"x must be an array-like object containing numeric values"</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> x.ndim <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"x must be one-dimensional"</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    bound <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(x) <span class="op">*</span> pct <span class="op">/</span> <span class="dv">100</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> bound <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> np.mean(x)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="dv">2</span><span class="op">*</span>bound <span class="op">&gt;=</span> <span class="bu">len</span>(x):</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"pct too large for the size of x"</span>)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> x[<span class="op">~</span>np.isnan(x)]</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    x <span class="op">=</span> np.sort(x)</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    mean_trimmed <span class="op">=</span> x[bound:<span class="op">-</span>bound]</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.mean(mean_trimmed)</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>price_mean_trimmed <span class="op">=</span> trimmed_mean(listings_1_7[<span class="st">"price"</span>], <span class="dv">5</span>)</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>price_mean <span class="op">=</span> listings_1_7[<span class="st">"price"</span>].mean()</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"The 5% trimmed mean of price is: </span><span class="sc">{</span>price_mean_trimmed<span class="sc">:.2f}</span><span class="ss">. The standard mean of price is: </span><span class="sc">{</span>price_mean<span class="sc">:.2f}</span><span class="ss">. This is an increase of </span><span class="sc">{</span>(price_mean<span class="op">-</span>price_mean_trimmed)<span class="op">/</span>price_mean<span class="op">*</span><span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%."</span>)</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"The prices have very high outliers, which is why the trimmed mean is much lower than the standard mean. The trimmed mean is preferable in this case, as the outliers might skew the results."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The 5% trimmed mean of price is: 116.85. The standard mean of price is: 201.24. This is an increase of 41.93%.
+The prices have very high outliers, which is why the trimmed mean is much lower than the standard mean. The trimmed mean is preferable in this case, as the outliers might skew the results.</code></pre>
+</div>
+</div>
+<div id="8586fa58" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.9 </span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># publication quality plots: Plots, die so schön sind, dass man sie in wissenschaflichen Publikationen verwenden könnte.</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>listings_1_9 <span class="op">=</span> listings_1_7.copy()</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>listings_1_9[<span class="st">"amenities_length"</span>] <span class="op">=</span> listings_1_9[<span class="st">"amenities"</span>].<span class="bu">str</span>.<span class="bu">len</span>()</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#from scipy.stats import trim_mean</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">2</span><span class="op">*</span><span class="dv">8</span>, <span class="dv">2</span><span class="op">*</span><span class="dv">5</span>), dpi<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>sns.violinplot(data<span class="op">=</span>listings_1_9, x<span class="op">=</span><span class="st">"room_type"</span>, y<span class="op">=</span><span class="st">"price"</span>, hue<span class="op">=</span><span class="st">"Shared_bath_status"</span>, log_scale<span class="op">=</span><span class="va">True</span>, split<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>,<span class="dv">0</span>])</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_title(<span class="st">"price distribution by room type and shared bath status"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_xlabel(<span class="st">"room type"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_ylabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>sns.violinplot(data<span class="op">=</span>listings_1_9, x<span class="op">=</span><span class="st">"instant_bookable"</span>, y<span class="op">=</span><span class="st">"price"</span>, hue<span class="op">=</span><span class="st">"host_is_superhost"</span>, split<span class="op">=</span><span class="va">True</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>,<span class="dv">1</span>], log_scale<span class="op">=</span><span class="va">True</span>, palette<span class="op">=</span><span class="st">"colorblind"</span>)</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_title(<span class="st">"price distribution by instant bookable and superhost status"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_xlabel(<span class="st">"instant bookable"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_ylabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>listings_1_9, x<span class="op">=</span><span class="st">"accommodates"</span>, y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">0</span>], log_scale<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"black"</span>, fill<span class="op">=</span><span class="va">False</span>, showfliers<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>sns.stripplot(data<span class="op">=</span>listings_1_9, x<span class="op">=</span><span class="st">"accommodates"</span>, y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">0</span>], alpha<span class="op">=</span><span class="fl">0.5</span>, log_scale<span class="op">=</span><span class="va">True</span>, hue<span class="op">=</span><span class="st">"instant_bookable"</span>, palette<span class="op">=</span><span class="st">"colorblind"</span>, size<span class="op">=</span><span class="dv">3</span>, dodge<span class="op">=</span><span class="va">True</span>, jitter<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="co">#ax[1,0].set_yscale("log") </span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_title(<span class="st">"price distribution by accommodates"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_xlabel(<span class="st">"accommodates"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_ylabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>listings_1_9, x<span class="op">=</span><span class="st">"amenities_length"</span>, y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">1</span>], alpha<span class="op">=</span><span class="fl">0.5</span>, hue<span class="op">=</span><span class="st">"host_is_superhost"</span>, palette<span class="op">=</span><span class="st">"colorblind"</span>)</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>sns.regplot(data<span class="op">=</span>listings_1_9, x<span class="op">=</span><span class="st">"amenities_length"</span>, y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">1</span>], scatter<span class="op">=</span><span class="va">False</span>, line_kws<span class="op">=</span>{<span class="st">"linewidth"</span>:<span class="dv">2</span>}, robust<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"black"</span>)</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_title(<span class="st">"price vs amenities length (characters)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_xlabel(<span class="st">"amenities length (characters)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_ylabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="co">#ax[1,1].set_xscale("log")</span></span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> ax.flatten():</span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>    a.grid(alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Aufgabe1_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="56c54564" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.9 Zusatz: alternative plots, die weniger informativ, aber vielleicht trotzdem interessant sind.</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">2</span><span class="op">*</span><span class="dv">8</span>, <span class="dv">2</span><span class="op">*</span><span class="dv">5</span>), dpi<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>listings_1_9, x<span class="op">=</span><span class="st">"review_scores_rating"</span>, y<span class="op">=</span><span class="st">"number_of_reviews"</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>,<span class="dv">0</span>], alpha<span class="op">=</span><span class="fl">0.5</span>, hue<span class="op">=</span><span class="st">"host_is_superhost"</span>, palette<span class="op">=</span><span class="st">"colorblind"</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co">#sns.regplot(data=listings_1_9, x="amenities_length", y="price", ax=ax[0,1], scatter=False, line_kws={"linewidth":2}, robust=True, color="black")</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">#, color="#7F7F7F"</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_title(<span class="st">"review scores vs number of reviews"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_xlabel(<span class="st">"review scores"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">0</span>].set_ylabel(<span class="st">"number of reviews (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co">#ax[0,1].set_xscale("log") </span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data<span class="op">=</span>listings_1_9, x<span class="op">=</span>listings_1_9.loc[(listings_1_9[<span class="st">"review_scores_rating"</span>]<span class="op">&gt;=</span><span class="fl">4.0</span>)][<span class="st">"review_scores_rating"</span>], y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">0</span>,<span class="dv">1</span>], alpha<span class="op">=</span><span class="fl">0.5</span>, hue<span class="op">=</span><span class="st">"host_is_superhost"</span>, palette<span class="op">=</span><span class="st">"colorblind"</span>)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_yscale(<span class="st">"log"</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_title(<span class="st">"price vs review scores (&gt;=4.0)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_xlabel(<span class="st">"review scores (&gt;=4.0)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>,<span class="dv">1</span>].set_ylabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)    </span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>sns.stripplot(data<span class="op">=</span>listings_1_9.loc[(listings_1_9[<span class="st">"bedrooms"</span>]<span class="op">&lt;=</span><span class="dv">7</span>)], x<span class="op">=</span><span class="st">"bedrooms"</span>, y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">0</span>], alpha<span class="op">=</span><span class="fl">0.5</span>, log_scale<span class="op">=</span><span class="va">True</span>, hue<span class="op">=</span><span class="st">"instant_bookable"</span>, palette<span class="op">=</span><span class="st">"colorblind"</span>, dodge<span class="op">=</span><span class="va">True</span>, jitter<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>listings_1_9.loc[(listings_1_9[<span class="st">"bedrooms"</span>]<span class="op">&lt;=</span><span class="dv">7</span>)], x<span class="op">=</span><span class="st">"bedrooms"</span>, y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">0</span>], log_scale<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"black"</span>, fill<span class="op">=</span><span class="va">False</span>, showfliers<span class="op">=</span><span class="va">False</span>, hue<span class="op">=</span><span class="st">"instant_bookable"</span>, dodge<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_title(<span class="st">"price distribution by number of bedrooms &lt;= 7"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_xlabel(<span class="st">"bedrooms"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">0</span>].set_ylabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>sns.stripplot(data<span class="op">=</span>listings_1_9.loc[(listings_1_9[<span class="st">"bathrooms_number"</span>]<span class="op">&lt;=</span><span class="dv">3</span>)], x<span class="op">=</span><span class="st">"bathrooms_number"</span>, y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">1</span>], alpha<span class="op">=</span><span class="fl">0.5</span>, log_scale<span class="op">=</span><span class="va">True</span>, hue<span class="op">=</span><span class="st">"instant_bookable"</span>, palette<span class="op">=</span><span class="st">"colorblind"</span>, dodge<span class="op">=</span><span class="va">True</span>, jitter<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>sns.boxplot(data<span class="op">=</span>listings_1_9.loc[(listings_1_9[<span class="st">"bathrooms_number"</span>]<span class="op">&lt;=</span><span class="dv">3</span>)], x<span class="op">=</span><span class="st">"bathrooms_number"</span>, y<span class="op">=</span><span class="st">"price"</span>, ax<span class="op">=</span>ax[<span class="dv">1</span>,<span class="dv">1</span>], log_scale<span class="op">=</span><span class="va">True</span>, color<span class="op">=</span><span class="st">"black"</span>, fill<span class="op">=</span><span class="va">False</span>, showfliers<span class="op">=</span><span class="va">False</span>, hue<span class="op">=</span><span class="st">"instant_bookable"</span>, dodge<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_title(<span class="st">"price distribution by number of bathrooms &lt;= 3"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_xlabel(<span class="st">"bathrooms number"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>,<span class="dv">1</span>].set_ylabel(<span class="st">"price (log scale)"</span>, fontsize<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a><span class="co"># listings_1_9.loc[(listings_1_9["bathrooms_number"]&lt;=3)]["bathrooms_number"]</span></span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a><span class="co"># data=listings_1_9.loc[(listings_1_9["bathrooms_number"]&lt;=3)]</span></span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> ax.flatten():</span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>    a.grid(alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\esoll\AppData\Local\Temp\ipykernel_22800\623918031.py:22: FutureWarning: 
+
+Setting a gradient palette using color= is deprecated and will be removed in v0.14.0. Set `palette='dark:black'` for the same effect.
+
+  sns.boxplot(data=listings_1_9.loc[(listings_1_9["bedrooms"]&lt;=7)], x="bedrooms", y="price", ax=ax[1,0], log_scale=True, color="black", fill=False, showfliers=False, hue="instant_bookable", dodge=True)
+C:\Users\esoll\AppData\Local\Temp\ipykernel_22800\623918031.py:28: FutureWarning: 
+
+Setting a gradient palette using color= is deprecated and will be removed in v0.14.0. Set `palette='dark:black'` for the same effect.
+
+  sns.boxplot(data=listings_1_9.loc[(listings_1_9["bathrooms_number"]&lt;=3)], x="bathrooms_number", y="price", ax=ax[1,1], log_scale=True, color="black", fill=False, showfliers=False, hue="instant_bookable", dodge=True)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Aufgabe1_files/figure-html/cell-14-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Aufgabe 1.10 Based on your exploration, write a brief summary (100–150 words) of the key patterns you observe in the Berlin Airbnb market. What factors appear most strongly associated with listing prices?</p>
+<p><em>Text</em></p>
+<div id="1b80ea79" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>listings_1_9[[<span class="st">"bedrooms"</span>, <span class="st">"room_type"</span>,<span class="st">"amenities"</span>]].head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">bedrooms</th>
+<th data-quarto-table-cell-role="th">room_type</th>
+<th data-quarto-table-cell-role="th">amenities</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>1.0</td>
+<td>Entire home/apt</td>
+<td>["Cooking basics", "Wine glasses", "Crib", "Ho...</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>4.0</td>
+<td>Entire home/apt</td>
+<td>["Cooking basics", "Crib", "Stove", "Elevator"...</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>0.0</td>
+<td>Entire home/apt</td>
+<td>["Ethernet connection", "Dishes and silverware...</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>0.0</td>
+<td>Entire home/apt</td>
+<td>["Cooking basics", "Building staff", "Essentia...</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>2.0</td>
+<td>Entire home/apt</td>
+<td>["Cooking basics", "Crib", "Elevator", "High c...</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="44b3c5d0" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.11</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"Daten/berlin_bezirke.geojson"</span>, <span class="st">"r"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    berlin_geojson <span class="op">=</span> json.load(f)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(berlin_geojson[<span class="st">"features"</span>]))</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>berlin_geojson[<span class="st">"features"</span>][<span class="dv">0</span>].keys()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>143</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>dict_keys(['type', 'properties', 'geometry', 'id'])</code></pre>
+</div>
+</div>
+<div id="a8863055" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.11 Jan</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"Daten/berlin_bezirke.geojson"</span>, <span class="st">"r"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    berlin_geojson <span class="op">=</span> json.load(f)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(berlin_geojson[<span class="st">"features"</span>]))</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>berlin_geojson[<span class="st">"features"</span>][<span class="dv">0</span>].keys()</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co"># We import re to check for and remove inconsistent whitespaces. </span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>bzr_names <span class="op">=</span> [feature[<span class="st">"properties"</span>][<span class="st">"BZR_NAME"</span>] <span class="cf">for</span> feature <span class="kw">in</span> berlin_geojson[<span class="st">"features"</span>]]</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>geo_df <span class="op">=</span> pd.DataFrame({<span class="st">"region_geo"</span>: bzr_names})</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>airbnb_regions <span class="op">=</span> listings_1_9[<span class="st">"neighbourhood_cleansed"</span>].unique()</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>airbnb_df <span class="op">=</span> pd.DataFrame({<span class="st">"region_airbnb"</span>: airbnb_regions})</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_region(name):</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> name.lower()</span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> name.replace(<span class="st">"str."</span>, <span class="st">"strasse"</span>)</span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> name.replace(<span class="st">"-"</span>, <span class="st">" "</span>)</span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> name.replace(<span class="st">"ß"</span>, <span class="st">"ss"</span>)</span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> name.replace(<span class="st">" / "</span>, <span class="st">"/"</span>)</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="dv">\s</span><span class="op">+</span><span class="vs">"</span>, <span class="st">" "</span>, name)</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> name.strip()</span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> name.split(<span class="st">"/"</span>)[<span class="dv">0</span>]</span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="kw">(</span><span class="vs">west </span><span class="dv">\d</span><span class="op">+</span><span class="kw">)</span><span class="dv">.</span><span class="op">*</span><span class="vs">"</span>, <span class="vs">r"</span><span class="ch">\1</span><span class="vs">"</span>, name)</span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="kw">(</span><span class="vs">nord </span><span class="dv">\d</span><span class="op">+</span><span class="kw">)</span><span class="dv">.</span><span class="op">*</span><span class="vs">"</span>, <span class="vs">r"</span><span class="ch">\1</span><span class="vs">"</span>, name)</span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> re.sub(<span class="vs">r"</span><span class="kw">(</span><span class="vs">ost </span><span class="dv">\d</span><span class="op">+</span><span class="kw">)</span><span class="dv">.</span><span class="op">*</span><span class="vs">"</span>, <span class="vs">r"</span><span class="ch">\1</span><span class="vs">"</span>, name)</span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> name</span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>geo_df[<span class="st">"clean_name"</span>] <span class="op">=</span> geo_df[<span class="st">"region_geo"</span>].<span class="bu">apply</span>(clean_region)</span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>airbnb_df[<span class="st">"clean_name"</span>] <span class="op">=</span> airbnb_df[<span class="st">"region_airbnb"</span>].<span class="bu">apply</span>(clean_region)</span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking for perfect matches after cleaning function</span></span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>auto_matches <span class="op">=</span> <span class="bu">set</span>(geo_df[<span class="st">"clean_name"</span>]) <span class="op">&amp;</span> <span class="bu">set</span>(airbnb_df[<span class="st">"clean_name"</span>])</span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>mapping_auto <span class="op">=</span> {name: name <span class="cf">for</span> name <span class="kw">in</span> auto_matches}</span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Connecting the pairs of" AirBnB names =&gt; geojson names" corresponding to the perfect matches in the mapping_auto dictionary.</span></span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>mapping_auto_v2 <span class="op">=</span> {airbnb_df.loc[airbnb_df[<span class="st">"clean_name"</span>]<span class="op">==</span>name][<span class="st">"region_airbnb"</span>].iloc[<span class="dv">0</span>]: geo_df.loc[geo_df[<span class="st">"clean_name"</span>]<span class="op">==</span>name][<span class="st">"region_geo"</span>].iloc[<span class="dv">0</span>] <span class="cf">for</span> name <span class="kw">in</span> auto_matches}</span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking for remaining unmatched regions</span></span>
+<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a>remaining_airbnb <span class="op">=</span> <span class="bu">set</span>(airbnb_df[<span class="st">"clean_name"</span>]) <span class="op">-</span> <span class="bu">set</span>(mapping_auto.keys())</span>
+<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a>remaining_geo<span class="op">=</span> <span class="bu">set</span>(geo_df[<span class="st">"clean_name"</span>]) <span class="op">-</span> <span class="bu">set</span>(mapping_auto.values())</span>
+<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Remaining Airbnb regions:"</span>, <span class="bu">sorted</span>(remaining_airbnb))</span>
+<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Remaining GeoJSON regions:"</span>, <span class="bu">sorted</span>(remaining_geo))</span>
+<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a><span class="co"># For the following selection of unmatched names, we manually created a mapping with the help of AI. </span></span>
+<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a><span class="co"># The remaining unmatched regions mostly relate to the geojson beeing more specific than airbnb. We matched airbnb_region =&gt; specific geojson_subnregion, prioritizing "nord" and "ost".</span></span>
+<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a>mapping_manual <span class="op">=</span> {</span>
+<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a>    <span class="st">"friedenau"</span>: <span class="st">"friedenau ost"</span>,</span>
+<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a>    <span class="st">"gropiusstadt"</span>: <span class="st">"gropiusstadt ost"</span>,</span>
+<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mariendorf"</span>: <span class="st">"mariendorf nord"</span>,</span>
+<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">"marienfelde"</span>: <span class="st">"marienfelde nord"</span>,</span>
+<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lichtenrade"</span>: <span class="st">"lichtenrade nord"</span>,</span>
+<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tempelhof"</span>: <span class="st">"tempelhof nord"</span>,</span>
+<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mv 1"</span>: <span class="st">"mv nord"</span>,</span>
+<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a>    <span class="st">"mv 2"</span>: <span class="st">"mv süd"</span>,</span>
+<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a>    <span class="st">"schöneberg nord"</span>: <span class="st">"schöneberg nordost"</span>,</span>
+<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a>    <span class="st">"schöneberg süd"</span>: <span class="st">"schöneberg südost"</span>,</span>
+<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a>    <span class="st">"kölln. vorstadt"</span>: <span class="st">"köllnische vorstadt"</span>,</span>
+<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a><span class="co"># We transformed the dictionary into one using the original rather than the cleaned names. </span></span>
+<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-80"><a href="#cb27-80" aria-hidden="true" tabindex="-1"></a>mapping_manual_v2 <span class="op">=</span> {airbnb_df.loc[airbnb_df[<span class="st">"clean_name"</span>]<span class="op">==</span>name_a][<span class="st">"region_airbnb"</span>].iloc[<span class="dv">0</span>]: geo_df.loc[geo_df[<span class="st">"clean_name"</span>]<span class="op">==</span>name_g][<span class="st">"region_geo"</span>].iloc[<span class="dv">0</span>] <span class="cf">for</span> name_a, name_g <span class="kw">in</span> mapping_manual.items()}</span>
+<span id="cb27-81"><a href="#cb27-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-82"><a href="#cb27-82" aria-hidden="true" tabindex="-1"></a><span class="co"># We matched the remaining airbnb regions to "altstadt köpenick" from the geojson, as a "collect the rest" solution. We chose "altstadt köpenick", as it was the first matchless entry in the geojson. </span></span>
+<span id="cb27-83"><a href="#cb27-83" aria-hidden="true" tabindex="-1"></a><span class="co"># It must be noted, that the mapped regions aren't actually all situated in "altstadt köpenick". It is merely compromise to achieve a complete mapping. "altstadt köpenick" should be interpreted as having no airbnb entries.</span></span>
+<span id="cb27-84"><a href="#cb27-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-85"><a href="#cb27-85" aria-hidden="true" tabindex="-1"></a>remaining_rest_airbnb <span class="op">=</span> <span class="bu">set</span>(airbnb_df[<span class="st">"clean_name"</span>]) <span class="op">-</span> <span class="bu">set</span>(mapping_auto.keys()) <span class="op">-</span> <span class="bu">set</span>(mapping_manual.keys())</span>
+<span id="cb27-86"><a href="#cb27-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-87"><a href="#cb27-87" aria-hidden="true" tabindex="-1"></a>mapping_rest <span class="op">=</span> {name: <span class="st">'altstadt köpenick'</span> <span class="cf">for</span> name <span class="kw">in</span> remaining_rest_airbnb}</span>
+<span id="cb27-88"><a href="#cb27-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-89"><a href="#cb27-89" aria-hidden="true" tabindex="-1"></a>mapping_rest_v2 <span class="op">=</span> {airbnb_df.loc[airbnb_df[<span class="st">"clean_name"</span>]<span class="op">==</span>name_a][<span class="st">"region_airbnb"</span>].iloc[<span class="dv">0</span>]: geo_df.loc[geo_df[<span class="st">"clean_name"</span>]<span class="op">==</span>name_g][<span class="st">"region_geo"</span>].iloc[<span class="dv">0</span>] <span class="cf">for</span> name_a, name_g <span class="kw">in</span> mapping_rest.items()}</span>
+<span id="cb27-90"><a href="#cb27-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-91"><a href="#cb27-91" aria-hidden="true" tabindex="-1"></a><span class="co"># We combined the three mappings to create a complete mapping of airbnb regions to geojson regions.</span></span>
+<span id="cb27-92"><a href="#cb27-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-93"><a href="#cb27-93" aria-hidden="true" tabindex="-1"></a>mapping <span class="op">=</span> {<span class="op">**</span>mapping_auto_v2, <span class="op">**</span>mapping_manual_v2, <span class="op">**</span>mapping_rest_v2}</span>
+<span id="cb27-94"><a href="#cb27-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-95"><a href="#cb27-95" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(mapping)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>143
+Remaining Airbnb regions: ['altstadt kietz', 'barstrasse', 'düsseldorfer strasse', 'forst grunewald', 'friedenau', 'gropiusstadt', 'heerstrasse nord', 'kantstrasse', 'kurfürstendamm', 'kölln. vorstadt', 'lichtenrade', 'mariendorf', 'marienfelde', 'mv 1', 'mv 2', 'neue kantstrasse', 'schöneberg nord', 'schöneberg süd', 'tempelhof', 'wiesbadener strasse']
+Remaining GeoJSON regions: ['altstadt köpenick', 'britz nord', 'friedenau ost', 'friedenau west', 'gropiusstadt ost', 'gropiusstadt west', 'köllnische vorstadt', 'lichtenrade nord', 'lichtenrade süd', 'lietzenburger strasse', 'mariendorf nord', 'mariendorf süd', 'marienfelde nord', 'marienfelde süd', 'mv nord', 'mv süd', 'rollbergesiedlung', 'schöneberg nordost', 'schöneberg nordwest', 'schöneberg südost', 'schöneberg südwest', 'tempelhof nord', 'tempelhof südost', 'tempelhof südwest']
+{'Müggelheim': 'Müggelheim', 'Schloß Charlottenburg': 'Schloss Charlottenburg', 'Kaulsdorf': 'Kaulsdorf', 'Heerstrasse': 'Heerstraße', 'Reuterstraße': 'Reuterstraße', 'Karlshorst': 'Karlshorst', 'Ost 2': 'Ost 2 - Alt-Reinickendorf', 'Blankenfelde/Niederschönhausen': 'Blankenfelde/Niederschönhausen', 'Tempelhofer Vorstadt': 'Tempelhofer Vorstadt', 'Schloßstr.': 'Schloßstraße', 'Bohnsdorf': 'Bohnsdorf', 'West 2': 'West 2 - Heiligensee/Konradshöhe', 'Siemensstadt': 'Siemensstadt', 'Schillerpromenade': 'Schillerpromenade', 'Altglienicke': 'Altglienicke', 'Mierendorffplatz': 'Mierendorffplatz', 'Neu-Hohenschönhausen Süd': 'Neu-Hohenschönhausen Süd', 'Halensee': 'Halensee', 'Pankow Süd': 'Pankow Süd', 'Adlershof': 'Adlershof', 'Marzahn-Süd': 'Marzahn Süd', 'Lankwitz': 'Lankwitz', 'Weißensee Ost': 'Weißensee Ost', 'Fennpfuhl': 'Fennpfuhl', 'Buch': 'Buch', 'Neuköllner Mitte/Zentrum': 'Neuköllner Mitte/Zentrum', 'Brunsbütteler Damm': 'Brunsbütteler Damm', 'Zehlendorf  Südwest': 'Zehlendorf Südwest', 'Schönholz/Wilhelmsruh/Rosenthal': 'Schönholz/Wilhelmsruh/Rosenthal', 'Buckow Nord': 'Buckow Nord', 'Köllnische Heide': 'Köllnische Heide', 'Prenzlauer Berg Süd': 'Prenzlauer Berg Süd', 'Prenzlauer Berg Südwest': 'Prenzlauer Berg Südwest', 'Niederschöneweide': 'Niederschöneweide', 'Alt-Hohenschönhausen Süd': 'Alt-Hohenschönhausen Süd', 'Neu-Hohenschönhausen Nord': 'Neu-Hohenschönhausen Nord', 'Friedrichshagen': 'Friedrichshagen', 'Friedrichsfelde Süd': 'Friedrichsfelde Süd', 'Alt-Lichtenberg': 'Alt-Lichtenberg', 'Plänterwald': 'Plänterwald', 'Wedding Zentrum': 'Wedding Zentrum', 'Karl-Marx-Allee-Nord': 'Karl-Marx-Allee Nord', 'nördliche Luisenstadt': 'Nördliche Luisenstadt', 'Köpenick-Nord': 'Köpenick Nord', 'Osloer Straße': 'Osloer Straße', 'Grünau': 'Grünau', 'Johannisthal': 'Johannisthal', 'Teltower Damm': 'Teltower Damm', 'Weißensee': 'Weißensee', 'Alt-Hohenschönhausen Nord': 'Alt-Hohenschönhausen Nord', 'Alexanderplatz': 'Alexanderplatz', 'Otto-Suhr-Allee': 'Otto-Suhr-Allee/Kantstraße', 'Tiergarten Süd': 'Tiergarten Süd', 'Falkenhagener Feld': 'Falkenhagener Feld', 'Buckow': 'Buckow', 'Haselhorst': 'Haselhorst', 'Brunnenstr. Nord': 'Brunnenstraße Nord', 'Köpenick-Süd': 'Köpenick Süd', 'Britz': 'Britz', 'Regierungsviertel': 'Regierungsviertel', 'Helmholtzplatz': 'Helmholtzplatz', 'Pankow Zentrum': 'Pankow Zentrum', 'Nord 1': 'Nord 1 - Frohnau/Hermsdorf', 'Moabit West': 'Moabit West', 'Prenzlauer Berg Nord': 'Prenzlauer Berg Nord', 'Rummelsburger Bucht': 'Rummelsburger Bucht', 'Brunnenstr. Süd': 'Brunnenstraße Süd', 'südliche Luisenstadt': 'Südliche Luisenstadt', 'Zehlendorf  Nord': 'Zehlendorf Nord', 'Biesdorf': 'Biesdorf', 'Blankenburg/Heinersdorf/Märchenland': 'Blankenburg/Heinersdorf/Märchenland', 'Oberschöneweide': 'Oberschöneweide', 'West 4': 'West 4 - Auguste-Viktoria-Allee', 'Mahlsdorf': 'Mahlsdorf', 'Ostpreußendamm': 'Ostpreußendamm', 'Südliche Friedrichstadt': 'Südliche  Friedrichstadt', 'Charlottenburg Nord': 'Charlottenburg Nord', 'Hellersdorf-Ost': 'Hellersdorf Ost', 'Westend': 'Westend', 'West 5': 'West 5 - Tegel', 'Malchow, Wartenberg und Falkenberg': 'Malchow, Wartenberg und Falkenberg', 'Allende-Viertel': 'Allende-Viertel', 'Albrechtstr.': 'Albrechtstraße', 'Spandau Mitte': 'Spandau Mitte', 'Wilhelmstadt': 'Wilhelmstadt', 'Hellersdorf-Nord': 'Hellersdorf Nord', 'Rixdorf': 'Rixdorf', 'Parkviertel': 'Parkviertel', 'Friedrichsfelde Nord': 'Friedrichsfelde Nord', 'Ost 1': 'Ost 1 - Reginhardstraße', 'Frankfurter Allee Süd FK': 'Frankfurter Allee Süd FK', 'Frankfurter Allee Nord': 'Frankfurter Allee Nord', 'Schmargendorf': 'Schmargendorf', 'Volkspark Wilmersdorf': 'Volkspark Wilmersdorf', 'Prenzlauer Berg Nordwest': 'Prenzlauer Berg Nordwest', 'Marzahn-Nord': 'Marzahn Nord', 'Neu Lichtenberg': 'Neu-Lichtenberg', 'West 1': 'West 1 - Tegel-Süd/Flughafensee', 'Dammvorstadt': 'Dammvorstadt', 'Buchholz': 'Buchholz', 'Rudow': 'Rudow', 'Frankfurter Allee Süd': 'Frankfurter Allee Süd', 'West 3': 'West 3 - Borsigwalde/Freie Scholle', 'Schmöckwitz/Karolinenhof/Rauchfangswerder': 'Schmöckwitz', 'Nord 2': 'Nord 2 - Waidmannslust/Wittenau/Lübars', 'Gatow / Kladow': 'Gatow/Kladow', 'Hellersdorf-Süd': 'Hellersdorf Süd', 'Alt  Treptow': 'Alt-Treptow', 'Rahnsdorf/Hessenwinkel': 'Rahnsdorf', 'Karow': 'Karow', 'Grunewald': 'Grunewald', 'Prenzlauer Berg Ost': 'Prenzlauer Berg Ost', 'Karl-Marx-Allee-Süd': 'Karl-Marx-Allee Süd', 'Baumschulenweg': 'Baumschulenweg', 'Drakestr.': 'Drakestraße', 'Marzahn-Mitte': 'Marzahn Mitte', 'Hakenfelde': 'Hakenfelde', 'Moabit Ost': 'Moabit Ost', 'Friedenau': 'Friedenau Ost', 'Gropiusstadt': 'Gropiusstadt Ost', 'Mariendorf': 'Mariendorf Nord', 'Marienfelde': 'Marienfelde Nord', 'Lichtenrade': 'Lichtenrade Nord', 'Tempelhof': 'Tempelhof Nord', 'MV 1': 'MV Nord', 'MV 2': 'MV Süd', 'Schöneberg-Nord': 'Schöneberg Nordost', 'Schöneberg-Süd': 'Schöneberg Südost', 'Kölln. Vorstadt/Spindlersf.': 'Köllnische Vorstadt/Spindlersfeld', 'Neue Kantstraße': 'Altstadt Köpenick', 'Forst Grunewald': 'Altstadt Köpenick', 'Altstadt-Kietz': 'Altstadt Köpenick', 'Wiesbadener Straße': 'Altstadt Köpenick', 'Barstraße': 'Altstadt Köpenick', 'Kurfürstendamm': 'Altstadt Köpenick', 'Heerstraße Nord': 'Altstadt Köpenick', 'Düsseldorfer Straße': 'Altstadt Köpenick', 'Kantstraße': 'Altstadt Köpenick'}</code></pre>
+</div>
+</div>
+<div id="68e1bb4e" class="cell" data-execution_count="17">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aufgabe 1.12 Jan</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>listings_1_12 <span class="op">=</span> listings_1_9.copy()</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>listings_1_12[<span class="st">"region_geo"</span>] <span class="op">=</span> listings_1_12[<span class="st">"neighbourhood_cleansed"</span>].<span class="bu">map</span>(mapping)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">#listings_1_12.columns</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listings_1_12[<span class="st">"region_geo"</span>].isna().<span class="bu">sum</span>())</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>region_stats <span class="op">=</span> (</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    listings_1_12</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    .groupby(<span class="st">"region_geo"</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    .agg(</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>        listings<span class="op">=</span>(<span class="st">"region_geo"</span>, <span class="st">"count"</span>),</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>        median_price<span class="op">=</span>(<span class="st">"price"</span>, <span class="st">"median"</span>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> nbformat</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> px.choropleth(</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>    region_stats,</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>    geojson<span class="op">=</span>berlin_geojson,</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>    locations<span class="op">=</span><span class="st">"region_geo"</span>,</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>    featureidkey<span class="op">=</span><span class="st">"properties.BZR_NAME"</span>,</span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"median_price"</span>,</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>    hover_name<span class="op">=</span><span class="st">"region_geo"</span>,</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>    hover_data<span class="op">=</span>{<span class="st">"listings"</span>: <span class="va">True</span>, <span class="st">"median_price"</span>: <span class="va">True</span>},</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Median Nightly Price of Airbnb Listings by Bezirksregion in Berlin"</span></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>fig.update_geos(fitbounds<span class="op">=</span><span class="st">"locations"</span>, visible<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>fig.update_layout(width <span class="op">=</span> <span class="dv">1200</span>, height <span class="op">=</span> <span class="dv">800</span>)</span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a><span class="co">#fig.show()</span></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a><span class="co">#Aufgabe 1.13 Jan</span></span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>listings_1_13 <span class="op">=</span> listings_1_12.copy()</span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>listings_1_13[<span class="st">"region_median_price"</span>] <span class="op">=</span> listings_1_13.groupby(<span class="st">"neighbourhood_cleansed"</span>)[<span class="st">"price"</span>].transform(<span class="st">"median"</span>)</span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>listings_1_13[<span class="st">"above_local_median"</span>] <span class="op">=</span> listings_1_13[<span class="st">"price"</span>] <span class="op">&gt;</span> listings_1_13[<span class="st">"region_median_price"</span>]</span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>scatter <span class="op">=</span> px.scatter_geo(</span>
+<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>    listings_1_13,</span>
+<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>    lat<span class="op">=</span><span class="st">"latitude"</span>,</span>
+<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>    lon<span class="op">=</span><span class="st">"longitude"</span>,</span>
+<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"above_local_median"</span>,</span>
+<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>    hover_data<span class="op">=</span>[<span class="st">"price"</span>, <span class="st">"region_median_price"</span>, <span class="st">"neighbourhood_cleansed"</span>]</span>
+<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> trace <span class="kw">in</span> scatter.data:</span>
+<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a>    fig.add_trace(trace)</span>
+<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a>    fig.update_traces(marker<span class="op">=</span><span class="bu">dict</span>(size<span class="op">=</span><span class="dv">5</span>, opacity<span class="op">=</span><span class="fl">0.5</span>), selector<span class="op">=</span><span class="bu">dict</span>(mode<span class="op">=</span><span class="st">'markers'</span>))</span>
+<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-59"><a href="#cb29-59" aria-hidden="true" tabindex="-1"></a>fig.show()    </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+</div>
+<p>Aufgabe 14</p>
+<div id="83af0bf3" class="cell" data-execution_count="18">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>region_stats.head()</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>remaining_geo2<span class="op">=</span> <span class="bu">set</span>(geo_df[<span class="st">"region_geo"</span>]) <span class="op">-</span> <span class="bu">set</span>(mapping.values())</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">sorted</span>(remaining_geo2))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>['Britz Nord', 'Friedenau West', 'Gropiusstadt West', 'Lichtenrade Süd', 'Lietzenburger Straße', 'Mariendorf Süd', 'Marienfelde Süd', 'Rollbergesiedlung', 'Schöneberg Nordwest', 'Schöneberg Südwest', 'Tempelhof Südost', 'Tempelhof Südwest']</code></pre>
+</div>
+</div>
+<div id="117d6c27" class="cell" data-execution_count="19">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Aufgabe 1.14 Jan</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>areas <span class="op">=</span> pd.DataFrame([</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    { <span class="st">"region_geo"</span>: f[<span class="st">"properties"</span>][<span class="st">"BZR_NAME"</span>],</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>       <span class="st">"area_km2"</span>: f[<span class="st">"properties"</span>][<span class="st">"GROESSE_m2"</span>] <span class="op">/</span> <span class="dv">1000000</span> }</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f <span class="kw">in</span> berlin_geojson[<span class="st">"features"</span>] ])</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>region_stats_area <span class="op">=</span> region_stats.merge(areas, on<span class="op">=</span><span class="st">"region_geo"</span>)</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>region_stats_area[<span class="st">"listing_density"</span>] <span class="op">=</span> region_stats_area[<span class="st">"listings"</span>] <span class="op">/</span> region_stats_area[<span class="st">"area_km2"</span>]</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>region_stats_area.head()</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> px.choropleth( region_stats_area, geojson<span class="op">=</span>berlin_geojson, locations<span class="op">=</span><span class="st">"region_geo"</span>, featureidkey<span class="op">=</span><span class="st">"properties.BZR_NAME"</span>, color<span class="op">=</span><span class="st">"listing_density"</span>, </span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>                hover_name<span class="op">=</span><span class="st">"region_geo"</span>, hover_data<span class="op">=</span>{<span class="st">"listings"</span>: <span class="va">True</span>, <span class="st">"area_km2"</span>: <span class="va">True</span>, <span class="st">"listing_density"</span>: <span class="va">True</span>}, title<span class="op">=</span><span class="st">"Airbnb Listing Density by Bezirksregion in Berlin"</span>)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>fig.update_geos(fitbounds<span class="op">=</span><span class="st">"locations"</span>, visible<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>fig.update_layout(width <span class="op">=</span> <span class="dv">1200</span>, height <span class="op">=</span> <span class="dv">800</span>)</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>fig.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<pre><code>Unable to display output for mime type(s): application/vnd.plotly.v1+json</code></pre>
+</div>
+</div>
+<p>Aufgabe 15: Write 100–150 words interpreting the spatial patterns visible in your maps. Which parts of Berlin are most and least expensive? Where is listing density highest? What urban factors (proximity to the city centre, tourist attractions, transport links, gentrification) might explain the patterns?</p>
+<p><em>Text</em></p>
+<div id="1925405b" class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co">#listings_1_13.to_csv("listings_1_13.csv")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -1,11 +1,13 @@
 ---
 title: "Assignment (Term Paper)"
-subtitle: "Statistical Programming, WS Term 2025/2026""
-format: pdf
+subtitle: "Statistical Programming, WS Term 2025/2026"
+format: 
+  html:
+    embed-resources: true
+    self-contained-math: true
 date: today
 date-format: long
 toc: false
-toc-depth: 3
 number-sections: false
 execute: 
   eval: true

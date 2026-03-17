@@ -31,8 +31,6 @@ execute:
 \end{center}
 :::
 
-
-
 \clearpage
 
 # Assignment (Term Paper)
@@ -48,22 +46,17 @@ print("Good Luck with your assignment!")
 
 Example inline math $E = mc^2$ and display math:
 
-$$
-\int_{a}^{b} f(x) \, dx = F(b) - F(a)
-$$
-
+$$\int_{a}^{b} f(x) \, dx = F(b) - F(a)$$
 
 \clearpage
 
 ## Section 2
-
 
 \clearpage
 
 ## Section 3
 
 \clearpage
-
 
 # References
 
@@ -83,16 +76,16 @@ $$
 
 \vspace{2cm}
 
-**Place, Date, Signature (1)** _______________________________________
+**Place, Date, Signature (1)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
 
 \vspace{2cm}
 
-**Place, Date, Signature (2)** _______________________________________
+**Place, Date, Signature (2)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
 
 \vspace{2cm}
 
-**Place, Date, Signature (3)** _______________________________________
+**Place, Date, Signature (3)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
 
 \vspace{2cm}
 
-**Place, Date, Signature (4)** _______________________________________
+**Place, Date, Signature (4)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_

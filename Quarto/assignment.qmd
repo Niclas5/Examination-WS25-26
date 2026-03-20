@@ -734,6 +734,7 @@ print("Average RMSE Lasso:", np.mean(rmse_lasso))
 
 The cross-validated RMSE values are close to each other, but Lasso performs somewhat worse in this setting. This fits the structure of the problem: the predictor set is not especially sparse, so forcing coefficients toward zero can remove useful information. OLS and Ridge are therefore more natural benchmarks here, while Lasso is less attractive for prediction.
 
+Task 2.7:
 The regression results suggest that listing size and quality are central for pricing. Listings that accommodate more guests, offer more bedrooms and bathrooms, and provide more amenities tend to be more expensive. Location also matters: being closer to the city centre is generally associated with higher prices. In addition, host-related features such as superhost status and instant booking appear to be linked to a price premium, although these effects are smaller than the effects of size and location. For a new host, the main advice would be to benchmark the listing against similar nearby properties and then adjust for concrete characteristics such as capacity, equipment, and booking convenience. A host should not simply copy the average market price. Instead, pricing should reflect the local area, the size of the apartment, and the quality of the offering. Small improvements in presentation and amenities may justify a moderate premium, but large pricing mistakes are more likely to come from ignoring location and listing size.
 
 ```{python}
@@ -756,6 +757,17 @@ print(pd.concat([ols_2_9.params, ols_2_9.tvalues, ols_2_9.pvalues], axis=1,
 print(ols_2_9.conf_int(0.05).rename(columns={0: "2.5%", 1: "97.5%"}).loc["host_is_superhost"])
 print(f"Percentage premium for superhost listings: {(np.exp(ols_2_9.params['host_is_superhost']) - 1):.2%}")
 ```
+
+We investigate whether being a superhost has a statistically significant effect on Airbnb listing prices. The null hypothesis is that there is no effect of superhost status on log price (H₀: β_superhost = 0), while the alternative hypothesis states that there is an effect (H₁: β_superhost ≠ 0).
+
+Using HC3-robust standard errors, the estimated coefficient is 0.045, with a t-statistic of 4.58 and a p-value of 0.000005. This provides strong evidence against the null hypothesis. The 95% confidence interval based on HC3 standard errors ranges from 0.0258 to 0.0644, which does not include zero and therefore supports the statistical significance of the effect.
+
+In real-world terms, the coefficient implies that superhost listings are associated with approximately 4.6% higher prices, holding other factors constant. This suggests that superhost status is valued in the Berlin Airbnb market, possibly reflecting higher trust, better service quality, or more positive guest experiences.
+
+Task 2.10
+Heteroscedasticity-robust standard errors are important because the variance of the error term is unlikely to be constant across Airbnb listings. In particular, more expensive listings tend to exhibit greater price variation than cheaper ones, leading to heteroscedasticity. While OLS coefficient estimates remain unbiased in this case, the standard errors become inconsistent. If heteroscedasticity were ignored, statistical inference would be unreliable, as standard errors are often underestimated, resulting in overly small p-values and potentially false significance.
+
+The estimated coefficient on the superhost variable should be interpreted as an association rather than a causal effect. Superhosts may differ systematically from other hosts in ways not fully captured by the model. For example, unobserved factors such as listing quality, interior design, location-specific attractiveness, or guest ratings may influence both the likelihood of being a superhost and the listing price, leading to omitted variable bias.
 
 \clearpage
 
@@ -1050,8 +1062,7 @@ for train, test in kf.split(X):
     ll_svm_3_7.append(log_loss(y_test_3_7, model_3_7_3.predict_proba(X_test_3_7)))
 
     model_3_7_4 = RandomForestClassifier(max_depth=5, random_state=0).fit(X_train_3_7, y_train_3_7)
-    y_pred_3_7_4 = model_3_7_4.predict(X_test_3_7)
-    acc_rf_3_7.append(accuracy_score(y_test_3_7, y_pred_3_7_4))
+    acc_rf_3_7.append(accuracy_score(y_test_3_7, model_3_7_4.predict(X_test_3_7)))
     ll_rf_3_7.append(log_loss(y_test_3_7, model_3_7_4.predict_proba(X_test_3_7)))
 
 print(f"Average Accuracy Logistic Regression: {np.mean(acc_log_reg_3_7):.2%}")

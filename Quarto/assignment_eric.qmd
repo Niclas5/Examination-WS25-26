@@ -1,0 +1,1144 @@
+---
+title: "Assignment (Term Paper)"
+subtitle: "Statistical Programming, WS Term 2025/2026"
+date: today
+format:
+  html:
+    embed-resources: true
+  pdf:
+    documentclass: article
+    papersize: a4
+    geometry:
+      - margin=2.5cm
+execute:
+  echo: true
+  warning: false
+  dpi: 150
+---
+
+**Team members**
+
+Niclas Schwarzbach (7962944)  
+Eric Ollanescu-Orendi (7959293)  
+Jan Gabske (7307849)  
+Abdel Rahman Obaisi (7168318)
+
+\clearpage
+
+# Section 1: Data Wrangling and Spatial Exploration
+
+This notebook covers the cleaning, transformation, and first exploration of the Berlin Airbnb data. The aim is to prepare a usable dataset and describe the main price patterns in a clear way.
+
+```{python}
+# Task 1.1
+
+import numpy as np
+import pandas as pd
+
+listings = pd.read_csv("../Daten/listings_berlin.csv")
+
+print(f"Number of rows: {len(listings)}")
+print(f"Number of columns: {len(listings.columns)}")
+missing_count = listings.isna().sum()
+missing_share = listings.isna().mean().map("{:.2%}".format)
+
+Table_1_1 = pd.DataFrame({"Number of missings": missing_count, "Share of missings": missing_share})
+Table_1_1.head(20)
+```
+
+```{python}
+# Task 1.2
+# Sort the table by missing-value share and display the top three columns.
+print("The following three variables have the highest missing-value rates:")
+Table_1_1.sort_values("Share of missings", ascending=False).head(3)
+```
+
+The three variables with the largest missing-value shares need different treatment.
+
+- **Price** should clearly be kept, since it is the main variable for later analysis. Missing prices cannot be imputed in a convincing way here, so we keep the column and only drop observations when price is required in a specific step.
+- **Host response rate** may still contain useful host-level information. We therefore keep the column for now instead of dropping it immediately.
+- **Reviews per month** is less essential because the dataset already includes the total number of reviews. For our later analysis it is not central, so this variable could be dropped without losing much information.
+
+Overall, we prefer to keep potentially relevant variables unless the later analysis shows that they are not needed.
+
+```{python}
+# Task 1.3
+# Convert the price column from string format to numeric values.
+def clean_price(price_str):
+    """Convert a price string to a numeric value."""
+
+    if pd.isna(price_str):
+        return np.nan
+    price_str_clean = str(price_str).replace("$", "").replace(',', '')
+    try:
+        price_number = float(price_str_clean)
+        if price_number > 0:
+            return price_number
+        return np.nan
+    except ValueError:
+        return np.nan
+
+# Apply the cleaning function to the full price column.
+listings_1_3 = listings.copy()
+listings_1_3["price"] = listings_1_3["price"].apply(clean_price)
+listings_1_3["price"].describe().loc[['min', '50%', 'mean', 'max']]
+```
+
+```{python}
+# Task 1.4
+listings_1_4 = listings_1_3.copy()
+# We first inspect the unique entries in bathrooms_text if needed.
+# listings_1_4["bathrooms_text"].unique()
+
+# Convert the bathroom information from text into a numeric representation.
+# Rule 1: "private" is redundant for the numeric count.
+# Rule 2: "shared" is stored in a separate boolean column.
+# Rule 3: a half bath is coded as 0.5.
+
+# Store shared-bath information.
+listings_1_4["Shared_bath_status"] = listings_1_4["bathrooms_text"].str.contains("shared", case=False)
+# Recode half baths.
+listings_1_4["bathrooms_text"] = listings_1_4["bathrooms_text"].str.replace("Half-Bath", "0.5", case=False)
+# Convert the remaining text to numeric values.
+listings_1_4["bathrooms_text"] = pd.to_numeric(
+    listings_1_4["bathrooms_text"].str.replace({
+        "baths": "",
+        "shared": "",
+        "private": "",
+        "bath": "",
+        " ": ""
+    }, case=False)
+)
+listings_1_4.rename(columns={"bathrooms_text": "bathrooms_number"}, inplace=True)
+listings_1_4[["bathrooms_number", "Shared_bath_status"]].head()
+print(listings_1_4.isna().sum())
+```
+
+```{python}
+# Task 1.5
+listings_1_5 = listings_1_4.copy()
+# Convert "t" and "f" to boolean values.
+listings_1_5["instant_bookable"] = listings_1_5["instant_bookable"] == "t"
+listings_1_5["host_is_superhost"] = listings_1_5["host_is_superhost"] == "t"
+# Create host tenure in years and drop the original date column.
+listings_1_5["host_tenure_years"] = 2025 - pd.to_datetime(listings_1_5["host_since"]).dt.year
+listings_1_5 = listings_1_5.drop(columns="host_since")
+listings_1_5.columns
+```
+
+```{python}
+# Task 1.6
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+log_prices = np.log(listings_1_5["price"])
+upper_bound = np.exp(np.mean(log_prices) + 2.33 * np.std(log_prices))
+# A z-value of 2.33 covers about 99% of the log-price distribution.
+
+listings_1_6 = listings_1_5.loc[listings_1_5["price"] <= upper_bound].copy()
+
+fig, ax = plt.subplots(1, 2, sharey=False, figsize=(10, 4.5))
+
+sns.histplot(data=listings_1_6, x="price", kde=True, ax=ax[0], log=False,
+             bins=round(10*np.log10(len(listings_1_5))), color="red", stat="count")
+ax[0].set_xlabel("price", fontsize=12)
+ax[0].set_ylabel("count", fontsize=12)
+ax[0].set_title("Price distribution on a linear scale", fontsize=10)
+
+sns.histplot(data=listings_1_6, x="price", kde=True, ax=ax[1], log=False,
+             bins=round(10*np.log10(len(listings_1_5))), color="navy", stat="count")
+ax[1].set_xlabel("price (log scale)", fontsize=12)
+ax[1].set_ylabel("count", fontsize=12)
+ax[1].set_xscale("log")
+ax[1].set_title("Price distribution on a logarithmic scale", fontsize=10)
+plt.tight_layout()
+plt.show()
+```
+
+When based on the full dataset, the histogramm on both the linear and the log scale are heavily dominated by outliers. The main body of the distribution would be compressed into such a narrow range, that an analysis becomes impossible. We chose to bypass that issue by introducing an upper bound to the price variable in our dataset. We calculated the bound to include 99% of listings based on the assumption of a log normal distribution. The resulting plots comfirm this assumption, as the log scale plot ist roughly normally distributed, while the linear scale plot is heavily right-skewed.
+
+For later statistical analysis, the logarithmic representation is the better choice. Prices appear roughly log-normal, and the log scale reduces the influence of extreme values. This makes the distribution more stable and better suited for regression-based work.
+
+```{python}
+# Task 1.7
+# Group by neighbourhood and compute summary statistics for price and ratings.
+table_1_7 = listings_1_5.groupby("neighbourhood_cleansed").agg({
+    "price": ["mean", "median", "count"],
+    "review_scores_rating": "mean"
+}).copy()
+
+# Round selected values and sort by median price.
+table_1_7 = table_1_7.round({("price", "mean"): 1, ("review_scores_rating", "mean"): 1})                      .sort_values(("price", "median"), ascending=False)
+
+table_1_7.head(3)
+# The three most expensive areas in this table are Haselhorst, West 5, and Schmargendorf.
+```
+
+```{python}
+# Task 1.8
+listings_1_8 = listings_1_5.copy()
+
+def trimmed_mean(x, pct):
+    """Calculate the trimmed mean after removing pct percent from both tails."""
+    if not (isinstance(pct, (int, float)) and 0 <= pct < 50):
+        raise ValueError("pct must be a number between 0 and 50")
+    try:
+        x = np.asarray(x, dtype=float)
+    except (TypeError, ValueError):
+        raise TypeError("x must be an array-like object containing numeric values")
+    if x.ndim != 1:
+        raise ValueError("x must be one-dimensional")
+    bound = int(len(x) * pct / 100)
+    if bound == 0:
+        return np.mean(x)
+    if 2 * bound >= len(x):
+        raise ValueError("pct too large for the size of x")
+    x = x[~np.isnan(x)]
+    x = np.sort(x)
+    mean_trimmed = x[bound:-bound]
+    return np.mean(mean_trimmed)
+
+price_mean_trimmed = trimmed_mean(listings_1_8["price"], 5)
+price_mean = listings_1_8["price"].mean()
+print(f"The 5% trimmed mean of price is: {price_mean_trimmed:.2f}. The arithmetic mean of price is: {price_mean:.2f}. This is an increase of {(price_mean-price_mean_trimmed)/price_mean*100:.2f}%.")
+
+print("The trimmed mean is lower because a small number of very expensive listings pull the arithmetic mean upward. In this setting the trimmed mean gives a more robust picture of a typical listing price.")
+```
+
+```{python}
+#To make the information in the amenities column available to our analysis, we transform the list like string entries to real python lists using the ast library. 
+#The existence of a dedicated function with this purpose within the ast library was brought to our attention by AI. 
+import ast
+
+# Parse the amenities column from string representation to a Python list.
+def clean_amenities(amenities_str):
+    if pd.isna(amenities_str):
+        return []
+    try:
+        amenities = ast.literal_eval(amenities_str)
+        return [a.strip() for a in amenities if isinstance(a, str)]
+    except (ValueError, SyntaxError):
+        return []
+# We apply the function to our dataset and calculate the number of entries per list. 
+listings_1_8["amenities_list"] = listings_1_8["amenities"].apply(clean_amenities)
+listings_1_8["amenities_count"] = listings_1_8["amenities_list"].apply(len)
+# do the same for the full dataset from 1_5
+listings_1_5["amenities_list"] = listings_1_5["amenities"].apply(clean_amenities)
+listings_1_5["amenities_count"] = listings_1_5["amenities_list"].apply(len)
+listings_1_8[["amenities", "amenities_list", "amenities_count"]].head(3)
+```
+
+```{python}
+# Task 1.9
+# we load the full data set from 1_5, so we can see the outliers in the plots. 
+listings_1_9 = listings_1_5.copy()
+
+fig, ax = plt.subplots(2, 2, figsize=(11, 7), dpi=200)
+
+sns.violinplot(data=listings_1_9, x="room_type", y="price", hue="Shared_bath_status", log_scale=True, split=True, ax=ax[0,0])
+ax[0,0].set_title("Price distribution by room type and shared bath status", fontsize=10)
+ax[0,0].set_xlabel("room type", fontsize=10)
+ax[0,0].set_ylabel("price (log scale)", fontsize=10)
+
+df_long = listings_1_9.melt(
+    id_vars=["price"],
+    value_vars=["host_is_superhost", "instant_bookable"],
+    var_name="feature",
+    value_name="value")
+sns.boxplot(data=df_long, x="feature", y="price", hue="value", showfliers=False, palette="colorblind", ax=ax[0,1], log_scale=True)
+sns.stripplot(data=df_long, x="feature", y="price", hue="value", dodge=True, alpha=0.15, size=1.5, jitter=0.2,
+              palette="dark:black", ax=ax[0,1], log_scale=True, legend=False)
+ax[0,1].set_title("Price distribution by superhost and instant-bookable status", fontsize=10)
+ax[0,1].set_xlabel("boolean feature", fontsize=10)
+ax[0,1].set_ylabel("price (log scale)", fontsize=10)
+
+sns.boxplot(data=listings_1_9, x="accommodates", y="price", ax=ax[1,0], log_scale=True, color="black", fill=False, showfliers=False)
+sns.stripplot(data=listings_1_9, x="accommodates", y="price", ax=ax[1,0], alpha=0.5, log_scale=True, size=3, jitter=True, color="orange")
+ax[1,0].set_title("Price distribution by accommodates", fontsize=10)
+ax[1,0].set_xlabel("accommodates", fontsize=10)
+ax[1,0].set_ylabel("price (log scale)", fontsize=10)
+
+sns.scatterplot(data=listings_1_9, x="amenities_count", y="price", ax=ax[1,1], alpha=0.5, hue="host_is_superhost", palette="colorblind")
+sns.regplot(data=listings_1_9, x="amenities_count", y="price", ax=ax[1,1], scatter=False, line_kws={"linewidth": 2}, robust=True, color="black")
+ax[1,1].set_title("Price vs. amenities count", fontsize=10)
+ax[1,1].set_yscale("log")
+ax[1,1].set_xlabel("amenities count", fontsize=10)
+ax[1,1].set_ylabel("price (log scale)", fontsize=10)
+
+for a in ax.flatten():
+    a.grid(alpha=0.3)
+ax[0,1].xaxis.grid(False)
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+print("Hotel room shared bath rate:",(listings_1_9.loc[listings_1_9["room_type"]=="Hotel room"]["Shared_bath_status"]==True).mean())
+print("Private room shared bath rate:",(listings_1_9.loc[listings_1_9["room_type"]=="Private room"]["Shared_bath_status"]==True).mean())
+```
+
+!!!!!!!!!!!!!!!!!!
+
+The first plot shows large price differences across room types. Shared rooms are clearly the cheapest, private rooms come next, and entire homes or hotel rooms tend to be more expensive. Shared bathrooms are optionally available for private rooms and hotel rooms, and listings with shared bathrooms are usually priced lower for private rooms. Unexpectatly, hotel rooms with a shared bath have a higher median price than those with private ones. It should be noted however, that only 5.5% of hotel rooms have a shared bathroom setup, compared to 56.9% of private rooms. Thus the validity of that trend suffers from a lower sample size, which the violin plot misleadingly portrais as similar to it's counterpart's. 
+
+!!!!!!!!!!!!!!!!!!
+
+The first plot shows that there are four types of bookables listed on AirBnB. Shared rooms make up the cheapest available type of rental unit with the lowest positioned distribution, followed by the private rooms and then apartments, with hotel rooms tending to be the most expensive. Logically, only private rooms and hotel rooms are optionally available with a shared bathroom, with apartments never and shared rooms only having them. As could be expected, shared room type AirBnBs tend to be cheaper than those with private bathrooms. Unexpectatly, hotel rooms with a shared bath have a higher median price than those with private ones. It should be noted however, that only 5.5% of hotel rooms have a shared bathroom setup, compared to 56.9% of private rooms. Thus the validity of that trend suffers from a lower sample size, which the violin plot misleadingly portrais as similar to it's counterpart's. 
+
+The second plot suggests that both superhost status and instant booking are associated with higher prices. The pattern is visible in both boxplots, although the differences are not equally strong.
+
+The third plot shows a clear positive relationship between the number of accommodated guests and price. Larger listings are generally more expensive.
+
+The fourth plot indicates a positive relationship between the number of amenities and price. The trend is not perfect, but the fitted line points upward, which suggests that more heavily equipped listings tend to charge more.
+
+The fourth plot portrais the dataset in relation to price and the number of items listed in the amenities section. Throughout the cluster, a slight but meaningful positive correlation can be observed, backed up by the robust regression line. Additionaly the figure shows that superhosts tend to list more amenities. A superhost premium beyond the regressed amenities related price increase is not clearly visible in the plot.
+
+
+```{python}
+# Optional extra plots for Section 1
+# These plots are less central for the final discussion but still useful for exploration.
+
+fig, ax = plt.subplots(2, 2, figsize=(11, 7), dpi=200)
+
+sns.scatterplot(data=listings_1_9, x="review_scores_rating", y="number_of_reviews", ax=ax[0,0], alpha=0.5, hue="host_is_superhost", palette="colorblind")
+ax[0,0].set_title("Review scores vs. number of reviews", fontsize=10)
+ax[0,0].set_yscale("log")
+ax[0,0].set_xlabel("review scores", fontsize=10)
+ax[0,0].set_ylabel("number of reviews (log scale)", fontsize=10)
+
+sns.scatterplot(data=listings_1_9, x=listings_1_9.loc[(listings_1_9["review_scores_rating"] >= 4.0)]["review_scores_rating"], y="price", ax=ax[0,1], alpha=0.5, hue="host_is_superhost", palette="colorblind")
+ax[0,1].set_yscale("log")
+ax[0,1].set_title("Price vs. review scores (>= 4.0)", fontsize=10)
+ax[0,1].set_xlabel("review scores (>= 4.0)", fontsize=10)
+ax[0,1].set_ylabel("price (log scale)", fontsize=10)
+
+sns.stripplot(data=listings_1_9.loc[(listings_1_9["bedrooms"] <= 7)], x="bedrooms", y="price", ax=ax[1,0], alpha=0.5, log_scale=True, hue="instant_bookable", palette="colorblind", dodge=True, jitter=0.2, zorder=1)
+sns.boxplot(data=listings_1_9.loc[(listings_1_9["bedrooms"] <= 7)], x="bedrooms", y="price", ax=ax[1,0], log_scale=True, palette="dark:black", fill=False, showfliers=False, hue="instant_bookable", dodge=True, zorder=10)
+ax[1,0].set_title("Price distribution by bedrooms (<= 7)", fontsize=10)
+ax[1,0].set_xlabel("bedrooms", fontsize=10)
+ax[1,0].set_ylabel("price (log scale)", fontsize=10)
+
+sns.stripplot(data=listings_1_9.loc[(listings_1_9["bathrooms_number"] <= 3)], x="bathrooms_number", y="price", ax=ax[1,1], alpha=0.5, log_scale=True, hue="instant_bookable", palette="colorblind", dodge=True, jitter=0.2, zorder=1)
+sns.boxplot(data=listings_1_9.loc[(listings_1_9["bathrooms_number"] <= 3)], x="bathrooms_number", y="price", ax=ax[1,1], log_scale=True, fill=False, palette="dark:black", showfliers=False, hue="instant_bookable", dodge=True, zorder=10)
+ax[1,1].set_title("Price distribution by bathrooms (<= 3)", fontsize=10)
+ax[1,1].set_xlabel("bathrooms", fontsize=10)
+ax[1,1].set_ylabel("price (log scale)", fontsize=10)
+
+for a in ax.flatten():
+    a.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+The Berlin Airbnb market shows a clear price gradient across listing characteristics. Room type is one of the strongest factors: shared rooms are cheapest, while entire homes and hotel rooms are more expensive. Capacity also matters a lot, since listings for more guests tend to have substantially higher prices. In addition, listings with more amenities are usually more expensive, which suggests that quality and equipment are reflected in pricing. Superhost status and instant booking also seem to be associated with a price premium, although these effects are less pronounced than room type or capacity. Spatially, central areas often combine high listing density with comparatively high prices, but the relationship is not perfect. Some peripheral regions also show high median prices, likely because they contain fewer listings and are therefore more sensitive to individual outliers. Overall, listing size, type, amenities, and location seem to matter most for prices.
+
+
+```{python}
+# Task 1.11: match region information from the Airbnb data to the GeoJSON data
+
+import json
+import re
+
+with open("../Daten/berlin_bezirke.geojson", "r", encoding="utf-8") as f:
+    berlin_geojson = json.load(f)
+
+print(len(berlin_geojson["features"]))
+berlin_geojson["features"][0].keys()
+
+bzr_names = [feature["properties"]["BZR_NAME"] for feature in berlin_geojson["features"]]
+geo_df = pd.DataFrame({"region_geo": bzr_names})
+
+airbnb_regions = listings_1_9["neighbourhood_cleansed"].unique()
+airbnb_df = pd.DataFrame({"region_airbnb": airbnb_regions})
+
+def clean_region(name):
+    name = name.lower()
+    name = name.replace("str.", "strasse")
+    name = name.replace("-", " ")
+    name = name.replace("ß", "ss")
+    name = name.replace(" / ", "/")
+    name = re.sub(r"\s+", " ", name)
+    name = name.strip()
+
+    name = name.split("/")[0]
+    name = re.sub(r"(west \d+).*", lambda m: m.group(1), name)
+    name = re.sub(r"(nord \d+).*", lambda m: m.group(1), name)
+    name = re.sub(r"(ost \d+).*", lambda m: m.group(1), name)
+
+    return name
+
+geo_df["clean_name"] = geo_df["region_geo"].apply(clean_region)
+airbnb_df["clean_name"] = airbnb_df["region_airbnb"].apply(clean_region)
+
+auto_matches = set(geo_df["clean_name"]) & set(airbnb_df["clean_name"])
+mapping_auto = {name: name for name in auto_matches}
+mapping_auto_v2 = {
+    airbnb_df.loc[airbnb_df["clean_name"] == name]["region_airbnb"].iloc[0]:
+    geo_df.loc[geo_df["clean_name"] == name]["region_geo"].iloc[0]
+    for name in auto_matches
+}
+
+remaining_airbnb = set(airbnb_df["clean_name"]) - set(mapping_auto.keys())
+remaining_geo = set(geo_df["clean_name"]) - set(mapping_auto.values())
+print("Remaining Airbnb regions:", sorted(remaining_airbnb))
+print("Remaining GeoJSON regions:", sorted(remaining_geo))
+
+# For the unmatched names below, we use a manual mapping after checking the cleaned names.
+mapping_manual = {
+    "friedenau": "friedenau ost",
+    "gropiusstadt": "gropiusstadt ost",
+    "mariendorf": "mariendorf nord",
+    "marienfelde": "marienfelde nord",
+    "lichtenrade": "lichtenrade nord",
+    "tempelhof": "tempelhof nord",
+    "mv 1": "mv nord",
+    "mv 2": "mv süd",
+    "schöneberg nord": "schöneberg nordost",
+    "schöneberg süd": "schöneberg südost",
+    "kölln. vorstadt": "köllnische vorstadt",
+}
+
+mapping_manual_v2 = {
+    airbnb_df.loc[airbnb_df["clean_name"] == name_a]["region_airbnb"].iloc[0]:
+    geo_df.loc[geo_df["clean_name"] == name_g]["region_geo"].iloc[0]
+    for name_a, name_g in mapping_manual.items()
+}
+
+mapping = {**mapping_auto_v2, **mapping_manual_v2}
+print(mapping)
+```
+
+A few unmatched regions remain after the name-based matching. In principle, these cases can be handled more reliably by using the listing coordinates and assigning each point directly to its geographic polygon. This is the better approach because it does not depend on naming conventions.
+
+```{python}
+import geopandas as gpd
+
+# Build a GeoDataFrame from the listing coordinates.
+listings_1_11 = listings_1_9.copy()
+
+gdf_listings = gpd.GeoDataFrame(
+    listings_1_11,
+    geometry=gpd.points_from_xy(listings_1_11["longitude"], listings_1_11["latitude"]),
+    crs="EPSG:4326"
+)
+
+# Load the GeoJSON file.
+gdf_bezirke = gpd.read_file("../Daten/berlin_bezirke.geojson")
+gdf_bezirke = gdf_bezirke.to_crs(gdf_listings.crs)
+
+# Spatial join: assign each listing to its Bezirksregion.
+result = gpd.sjoin(
+    gdf_listings,
+    gdf_bezirke[["BZR_NAME", "GROESSE_m2", "geometry"]],
+    how="left",
+    predicate="within"
+)
+
+# Copy the matched region information back to the main table.
+listings_1_11[["BZR_NAME", "GROESSE_m2"]] = result[["BZR_NAME", "GROESSE_m2"]].values
+listings_1_11 = listings_1_11.drop(columns=["neighbourhood_cleansed"])
+listings_1_11.head()
+```
+
+```{python}
+# Task 1.12
+
+listings_1_12 = listings_1_11.loc[listings_1_11["price"] < upper_bound].copy()
+
+region_stats = (
+    listings_1_12
+    .groupby("BZR_NAME")
+    .agg(
+        listings=("BZR_NAME", "count"),
+        median_price=("price", "median")
+    )
+    .reset_index()
+)
+
+import plotly.express as px
+
+fig = px.choropleth(
+    region_stats,
+    geojson=berlin_geojson,
+    locations="BZR_NAME",
+    featureidkey="properties.BZR_NAME",
+    color="median_price",
+    hover_name="BZR_NAME",
+    hover_data={"listings": True, "median_price": True},
+    title="Median nightly price of Airbnb listings by Bezirksregion in Berlin"
+)
+
+fig.update_geos(fitbounds="locations", visible=True)
+fig.update_layout(height=550, margin=dict(l=0, r=0, t=50, b=0))
+fig.show()
+
+# Task 1.13
+listings_1_13 = listings_1_12.copy()
+listings_1_13["region_median_price"] = listings_1_13.groupby("BZR_NAME")["price"].transform("median")
+listings_1_13["above_local_median"] = listings_1_13["price"] > listings_1_13["region_median_price"]
+
+scatter = px.scatter_geo(
+    listings_1_13,
+    lat="latitude",
+    lon="longitude",
+    color="above_local_median",
+    hover_data=["price", "region_median_price", "BZR_NAME"]
+)
+
+for trace in scatter.data:
+    fig.add_trace(trace)
+    fig.update_traces(marker=dict(size=5, opacity=0.5), selector=dict(mode='markers'))
+
+fig.update_layout(height=550, margin=dict(l=0, r=0, t=50, b=0), legend={"x": 0.94, "y": 1})
+fig.show()
+```
+
+```{python}
+# Task 1.14
+
+region_stats.head()
+
+region_stats = region_stats.merge(gdf_bezirke[["BZR_NAME", "GROESSE_m2"]], on="BZR_NAME", how="left")
+region_stats["GROESSE_km2"] = (region_stats["GROESSE_m2"] / 1_000_000).astype(float)
+region_stats["listings_per_km2"] = (region_stats["listings"] / region_stats["GROESSE_km2"]).astype(float)
+
+fig = px.choropleth(
+    region_stats,
+    geojson=berlin_geojson,
+    locations="BZR_NAME",
+    featureidkey="properties.BZR_NAME",
+    color="listings_per_km2",
+    hover_name="BZR_NAME",
+    hover_data={"listings": True, "median_price": True},
+    title="Airbnb listing density by Bezirksregion in Berlin"
+)
+fig.update_geos(fitbounds="locations", visible=True)
+fig.update_layout(height=550, margin=dict(l=0, r=0, t=50, b=0))
+fig.show()
+```
+
+Listing density is clearly highest in central Berlin. The density map shows a strong concentration of Airbnb activity near the inner city, while most outer areas have far fewer listings per square kilometer. The price map points in a similar direction, but the pattern is less uniform. Central areas are often expensive, yet some peripheral regions also show high median prices. These cases should be interpreted carefully, because regions with only a small number of listings are more affected by individual high-price observations.
+
+Taken together, the maps suggest that centrality matters for both density and price, but more strongly for density. Proximity to major attractions, public transport, and established urban neighborhoods likely explains why the centre dominates the market. At the same time, local factors such as neighborhood image, housing type, or small sample sizes can create high-price pockets outside the centre.
+
+The following markdown cell was kept in the original notebook as a draft note. The final interpretation is given in the previous cell.
+
+The maps suggest a clear centre–periphery pattern. Listing density is much higher in central Berlin than in the outer parts of the city. This is plausible because central areas are closer to tourist attractions, nightlife, restaurants, and major transport links. Median prices also tend to be higher in the centre, but the pattern is less clean than for density. Some non-central Bezirksregionen show relatively high median prices as well. These values should be read carefully, since they may be driven by a limited number of listings rather than a broad market pattern. Overall, centrality seems to matter strongly for where Airbnb listings are concentrated, while prices are shaped by a mix of location, local demand, and listing-specific features such as size and amenities.
+
+```{python}
+listings_1_13.to_csv("listings_1_13.csv")
+```
+
+\clearpage
+
+## Section 2
+
+```{python}
+# Task 2.1
+# Load the cleaned data from Section 1 and prepare the regression sample.
+import pandas as pd
+import numpy as np
+listings_2 = pd.read_csv("../Aufgabe 1/listings_1_13.csv", index_col="Unnamed: 0")
+listings_2["price"] = listings_2["price"].replace(0, pd.NA)
+listings_2.dropna(subset=["price"], inplace=True)
+
+print(listings_2.columns)
+
+listings_2_1 = listings_2[[
+    "price",
+    "accommodates",
+    "latitude",
+    "longitude",
+    "amenities_count", 
+    "bedrooms", 
+    "host_is_superhost", 
+    "Shared_bath_status", 
+    "instant_bookable", 
+    "bathrooms_number"]].copy()
+#Drops NA
+listings_2_1.dropna(inplace=True)
+listings_2_1["price"] = listings_2_1["price"].apply(np.log)
+listings_2_1.rename(columns={"price":"log_price"}, inplace=True)
+#We have checked that there are no NA values.  No further cleaning is necessary.
+
+#Report the sample size used in the regression.
+print(f"The sample size amounuts to: {len(listings_2_1)}")
+```
+
+The predictor set is based on the patterns from Section 1. We include accommodation size, bedrooms, bathrooms, amenities, location, and booking-related host characteristics. These variables capture the main dimensions that are likely to influence Airbnb prices: listing size, quality, convenience, and market position.
+Those variables were in our view and experience the most relevant ones for a price regression.
+
+In order for the location to be evaluable in a regression, we need to transform the latitude and longitude variables. We do this by calculating the distance to the geographic center of the dataset assuming out of experience, that there should be linear correlation between the distance to the center and the price, which gives us a single compact location measure.
+
+```{python}
+# Replace latitude and longitude with distance to the dataset's geographic center.
+# This gives one compact location measure instead of two coordinates.
+lon_center = listings_2_1["longitude"].mean()
+lat_center = listings_2_1["latitude"].mean()
+
+listings_2_1["distance_center"] = np.sqrt(
+    (listings_2_1["latitude"] - lat_center) ** 2 +
+    (listings_2_1["longitude"] - lon_center) ** 2
+)
+
+listings_2_1 = listings_2_1.drop(columns=["latitude", "longitude"])
+```
+
+```{python}
+#Task_2_2
+import statsmodels.api as sm
+outcome = listings_2_1["log_price"]
+regressor = listings_2_1.drop(columns=["log_price"])
+regressor = sm.add_constant(regressor)
+
+bool_cols = regressor.select_dtypes("bool").columns
+regressor[bool_cols] = regressor[bool_cols].astype(int)
+#print(regressor.dtypes)
+olssim = sm.OLS(outcome, regressor)
+olssim = olssim.fit()
+olssim.summary()
+```
+
+Note, that we carried the filtered data to exclude the top 1% of listings.
+
+Because p<0.05, we reject the null hypothesis of normality. 
+Since we are dealing with a log_normal distribution we have to convert the coefficient to a percentage change by using the formula: 100*(exp(coef)-1). This means that the coefficient of 0.0441 for host_is_superhost translates to a price increase of about +4.51% compared to non-superhosts, holding all other factors constant.
+Therefore, there is a premium for apartments with superhosts of about +4.51%.
+An instant bookable listing has a price increase of about +21.2% compared to non-instant bookable listings, holding all other factors constant.
+On the other hand the the distance to the center has a negative coefficient, which means that listings farther from the center tend to be cheaper.They tend to be -78.7% cheaper than those at the center.
+
+An R^2 of 0,465 indicates that the model explains about 46.5% of the variance in log prices. This is a solid but not high level of explanatory power, suggesting that while the included predictors capture important factors, there is still substantial variation in prices that is not explained by the model.  
+
+```{python}
+# Task 2_3
+
+import matplotlib.pyplot as plt
+
+fitted = olssim.fittedvalues
+residuals = olssim.resid
+
+fig, ax = plt.subplots(1, 2, figsize=(10, 4.5))
+
+ax[0].scatter(fitted, residuals, alpha=0.5)
+ax[0].axhline(0, color='red', linestyle='--')
+ax[0].set_xlabel("Fitted values")
+ax[0].set_ylabel("Residuals")
+ax[0].set_title("Residuals vs. fitted values")
+
+ax[1].scatter(fitted, outcome, alpha=0.5)
+ax[1].plot([outcome.min(), outcome.max()], [outcome.min(), outcome.max()], 'r--')
+ax[1].set_xlabel("Fitted values")
+ax[1].set_ylabel("True values")
+ax[1].set_title("True vs. fitted values")
+
+plt.tight_layout()
+plt.show()
+print(len(outcome))
+```
+
+The residuals are centered around zero and do not show a strong systematic pattern, which supports the linear specification as a reasonable first approximation. At the same time, there is still some spread and a few visible outliers, so the model should not be treated as perfect. The fitted-vs-true plot shows that the model captures broad price differences, but it does not explain all variation in listing prices.
+
+```{python}
+#Task 2_4 preparation
+#First we used the already included RidgeCV function from sklearn, which performs Ridge regression with built-in cross-validation to select the optimal regularization parameter, to compare with the ladder results. The results use a standard lambda of 0.01.
+import sklearn.linear_model
+
+ridgecv_reg = sklearn.linear_model.RidgeCV(cv=10, fit_intercept = False)
+model_ridge = ridgecv_reg.fit(regressor, outcome)
+
+print(model_ridge.coef_)
+Y2_est = model_ridge.predict(regressor) # Prediction for Y2
+MSE = np.mean((outcome-Y2_est)**2)
+print("Mean-Squared-Error:", round(MSE, 4))
+print("R^2 Score:", round(model_ridge.score(regressor, outcome), 4))
+#A comparisson with the results of the following manual Ridge estimation with NumPy shows that the coefficients are very similar but not exactly the same, which confirms that our implementation is correct. The MSE and R^2 values are also close to those from the OLS model, but the Ridge regression may have slightly better generalization performance due to the regularization effect.
+```
+
+```{python}
+# Task 2_4: manual Ridge estimation with NumPy
+def ridge_estimate(X: np.ndarray, y: np.ndarray, lam: float) -> np.ndarray:
+    """Compute Ridge coefficients using the closed-form formula."""
+    X = np.asarray(X)
+    y = np.asarray(y)
+    p = X.shape[1]
+    I = np.eye(p)
+
+    beta_ridge = np.linalg.inv(X.T @ X + lam * I) @ (X.T @ y)
+    return beta_ridge
+
+def l2_norm(beta: np.ndarray) -> float:
+    """Compute the Euclidean norm of the coefficient vector."""
+    return np.sqrt(np.sum(beta ** 2))
+
+lambdas = [0.01, 1, 100]
+X_data = regressor.values
+y_data = outcome.values
+
+for lam in lambdas:
+    beta_hat = ridge_estimate(X_data, y_data, lam)
+    norm = l2_norm(beta_hat)
+
+    print(f"Results for lambda = {lam}:")
+    print(f"||beta||_2 (l2 norm): {norm:.6f}")
+    print(f"Coefficients (excerpt): {beta_hat[:3]}")
+    print("-" * 30)
+```
+
+The l_2-norm ||β||_2 = 3.513462 is the smallest für the Ridge regression model at lambda=100, which suggests that it has the most regularization effect among the three models. This is expected, as Ridge regression adds a penalty term to the loss function that shrinks the coefficients towards zero, thus reducing their magnitude. The Lasso regression model has a larger l_2-norm than Ridge, but still smaller than the OLS model, indicating that it also applies some regularization but allows for some coefficients to be exactly zero. 
+
+```{python}
+# Task 2_5
+# fit_intercept=False is used because the regressor matrix already contains a constant.
+fig, ax = plt.subplots(2, 1, figsize=(9, 6))
+
+def lasso_with_eps(epsilon, x_ax):
+    lasso_reg = sklearn.linear_model.LassoCV(cv=10, fit_intercept=False, eps=epsilon)
+    model = lasso_reg.fit(regressor, outcome)
+
+    print("Lasso coefficients:")
+    print(model.coef_)
+
+
+    m_log_alphas = -np.log10(model.alphas_)
+    ax[x_ax].plot(m_log_alphas, model.mse_path_, ':')
+    ax[x_ax].plot(m_log_alphas, model.mse_path_.mean(axis=-1), 'k',
+                  label='Average across folds', linewidth=2)
+    ax[x_ax].axvline(-np.log10(model.alpha_), linestyle='--', color='k',
+                     label='alpha selected by CV')
+    ax[x_ax].legend()
+    ax[x_ax].set_xlabel('-log(alpha)')
+    ax[x_ax].set_ylabel('Mean squared error')
+    ax[x_ax].set_title('Cross-validated mean squared error')
+    ax[x_ax].axis('tight')
+
+    ax[0].text(0.02, 0.98, "(a)", transform=ax[0].transAxes,
+            ha="left", va="top", fontsize=12, fontweight="bold")
+    ax[1].text(0.02, 0.98, "(b)", transform=ax[1].transAxes,
+            ha="left", va="top", fontsize=12, fontweight="bold")
+
+    zero_mask = model.coef_ == 0
+    zero_features = regressor.columns[zero_mask]
+    non_zero_features = regressor.columns[~zero_mask]
+
+    print("Alpha selected via cross-validation:", round(model.alpha_, 13))
+    print("List of Zero-coefficient features:")
+    print(list(zero_features))
+    print("List of Non-zero-coefficient features:")
+    print(list(non_zero_features))
+    print("L2 norm of coefficients:", np.linalg.norm(model.coef_, 2))
+    print("-" * 30)
+
+lasso_with_eps(1e-12, 0)
+lasso_with_eps(1e-3, 1)
+plt.tight_layout()
+plt.show()
+```
+
+If the standard automatic alpha selection procedure is used (see (b)), it uses the the default epsilon value of 1e-3, which is relatively large. In that case, the selected alpha is much larger than with a smaller epsilon, which leads to more aggressive regularization and more coefficients being pushed to zero. 
+The features: 'bedrooms', 'host_is_superhost', 'Shared_bath_status', 'instant_bookable', 'distance_center'are being set at zero.
+For the Minimum of the Average MSE to show, eps must be set to a the value of ~1e-12 (see (a)). This results in a very small alpha, which is the regalurization strength. The small alpha indicates that the model is very close to an OLS regression, which is consistent with the fact that the lasso coefficients are not heavily shrunk towards zero. The fact that some coefficients are exactly zero suggests that the lasso has identified certain features as less relevant for predicting the outcome, while still allowing other features to have non-zero coefficients. The extension to eps=1e-12 would result therefore in zero "Zero-coefficients" and only Non-zero coefficients. The model is thus very close to an OLS regression, without any significant regularization effect. This is consistent with the fact that the l_2-norm of the coefficients is not much smaller than that of the OLS model, indicating that the coefficients are not heavily shrunk towards zero.
+With a very small epsilon, the selected alpha is also very small, so the Lasso solution stays close to OLS. In that case the regularization effect is weak and only limited coefficient shrinkage occurs. This suggests that the data do not strongly support a sparse model in which many predictors should be pushed exactly to zero.
+
+```{python}
+#Aufgabe 2_6
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_squared_error
+X = regressor.values
+y = outcome.values
+kf = KFold(n_splits=5, shuffle=True, random_state=12883823)
+rmse_ols = []
+rmse_ridge = []
+rmse_lasso = []
+for train, test in kf.split(X):
+    X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
+
+    # OLS
+    ols_model_2_6 = sm.OLS(y_train, X_train).fit()
+    y_pred_ols_2_6 = ols_model_2_6.predict(X_test)
+    rmse_ols.append(np.sqrt(mean_squared_error(y_test, y_pred_ols_2_6)))
+
+    # Ridge
+    ridgecv_reg_2_6 = sklearn.linear_model.RidgeCV(cv=5, fit_intercept = False).fit(X_train, y_train)
+    Y2_est_2_6 = ridgecv_reg_2_6.predict(X_test)
+    rmse_ridge.append(np.sqrt(mean_squared_error(y_test, Y2_est_2_6)))
+    
+    # Lasso
+    lasso_reg_2_6 = sklearn.linear_model.LassoCV(cv=5,fit_intercept =False).fit(X_train, y_train)
+    y_pred_lasso_2_6 = lasso_reg_2_6.predict(X_test)
+    rmse_lasso.append(np.sqrt(mean_squared_error(y_test, y_pred_lasso_2_6)))
+
+print("Average RMSE OLS:", np.mean(rmse_ols))
+print("Average RMSE Ridge:", np.mean(rmse_ridge))
+print("Average RMSE Lasso:", np.mean(rmse_lasso))
+```
+
+The cross-validated RMSE values are close to each other, but Lasso performs somewhat worse in this setting. This fits the structure of the problem: the predictor set is not especially sparse, so forcing coefficients toward zero can remove useful information. OLS and Ridge are therefore more natural benchmarks here, while Lasso is less attractive for prediction.
+
+The regression results suggest that listing size and quality are central for pricing. Listings that accommodate more guests, offer more bedrooms and bathrooms, and provide more amenities tend to be more expensive. Location also matters: being closer to the city centre is generally associated with higher prices. In addition, host-related features such as superhost status and instant booking appear to be linked to a price premium, although these effects are smaller than the effects of size and location. For a new host, the main advice would be to benchmark the listing against similar nearby properties and then adjust for concrete characteristics such as capacity, equipment, and booking convenience. A host should not simply copy the average market price. Instead, pricing should reflect the local area, the size of the apartment, and the quality of the offering. Small improvements in presentation and amenities may justify a moderate premium, but large pricing mistakes are more likely to come from ignoring location and listing size.
+
+```{python}
+# Task 2.8
+model_2_8 = sm.QuantReg(outcome, regressor)
+res_2_8 = model_2_8.fit(q=0.5)
+res_2_8.summary().tables[1]
+```
+
+```{python}
+# Task 2.9
+# H0: beta_host_is_superhost = 0
+# H1: beta_host_is_superhost != 0
+ols_2_9 = sm.OLS(outcome, regressor).fit(cov_type="HC3")
+ols_2_9.summary().tables[1]
+
+print(pd.concat([ols_2_9.params, ols_2_9.tvalues, ols_2_9.pvalues], axis=1,
+                keys=["Coefficient", "t-Statistic", "p-Value"]).loc["host_is_superhost"])
+
+print(ols_2_9.conf_int(0.05).rename(columns={0: "2.5%", 1: "97.5%"}).loc["host_is_superhost"])
+print(f"Percentage premium for superhost listings: {(np.exp(ols_2_9.params['host_is_superhost']) - 1):.2%}")
+```
+
+\clearpage
+
+## Section 3
+
+```{python}
+# Task 3.1
+import pandas as pd
+
+# Load the training data.
+X_train = pd.read_csv("../Daten//X_train.csv", index_col=0)
+y_train = pd.read_csv("../Daten//y_train.csv", index_col=0)
+
+n_obs, n_variables = X_train.shape
+print(f"Observations: {n_obs}, Variables: {n_variables}")
+
+default_fraction = y_train.mean().values[0]
+print(f"Fraction of defaults: {default_fraction:.2%}")
+
+summary_stats = X_train.describe().loc[['mean', 'std', 'min', 'max']]
+print(summary_stats)
+```
+
+Distance-based methods such as KNN and SVM are sensitive to the scale of the input variables. Features like annual income, loan amount, and revolving balance have much larger numerical ranges than binary indicators or ratios. Without scaling, those large-scale variables would dominate the distance calculations. For that reason, standardization is necessary before applying methods that rely on distances or margins in feature space.
+
+
+```{python}
+# Task 3.2
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
+
+# Standardize the features.
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+
+# Fit logistic regression.
+log_reg = LogisticRegression()
+log_reg.fit(X_train_scaled, y_train.values.ravel())
+
+# Report training accuracy.
+y_pred = log_reg.predict(X_train_scaled)
+train_accuracy = accuracy_score(y_train, y_pred)
+print(f"Training Accuracy: {train_accuracy:.4f}")
+
+# Rank features by absolute coefficient size.
+coef_df = pd.DataFrame({
+    'Feature': X_train.columns,
+    'Coefficient': log_reg.coef_[0],
+    'Abs_Coefficient': abs(log_reg.coef_[0])
+}).sort_values(by='Abs_Coefficient', ascending=False)
+
+print("Top 3 features by absolute coefficient:")
+print(coef_df.head(3))
+```
+
+After standardization, the coefficients can be compared more directly because all variables are measured on the same scale. A positive coefficient indicates that higher values of the feature are associated with a higher probability of default, while a negative coefficient points in the opposite direction. The variables with the largest absolute coefficients are therefore the strongest predictors in the logistic model.
+
+
+```{python}
+# Task 3.3
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+import pandas as pd
+
+# Split the data into training and validation sets.
+X_train_k, X_val_k, y_train_k, y_val_k = train_test_split(
+    X_train_scaled, y_train.values.ravel(), test_size=0.2, random_state=12883823
+)
+
+# Test different values of k and different weighting schemes.
+k_values = [5, 20, 50]
+weight_options = ['uniform', 'distance']
+
+results = []
+
+for k in k_values:
+    for weight in weight_options:
+        knn = KNeighborsClassifier(n_neighbors=k, weights=weight)
+        knn.fit(X_train_k, y_train_k)
+
+        accuracy = knn.score(X_val_k, y_val_k)
+        error_rate = 1 - accuracy
+
+        results.append({
+            'k': k,
+            'weights': weight,
+            'error_rate': error_rate
+        })
+
+knn_results_df = pd.DataFrame(results)
+print(knn_results_df)
+```
+
+KNN is strongly affected by the scale of the predictors because classification is based on distances between observations. After standardization, the method becomes more meaningful, but the results still depend on the choice of \(k\). Smaller values of \(k\) react more strongly to local variation, whereas larger values produce a smoother and more stable decision rule.
+
+
+```{python}
+# Task 3.4
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# Fit SVM with a linear kernel.
+svm_linear = SVC(kernel='linear')
+svm_linear.fit(X_train_k, y_train_k)
+acc_linear = svm_linear.score(X_val_k, y_val_k)
+
+# Fit SVM with an RBF kernel for different values of C.
+c_values = [0.1, 1, 10]
+rbf_results = {}
+
+for c in c_values:
+    svm_rbf = SVC(kernel='rbf', C=c)
+    svm_rbf.fit(X_train_k, y_train_k)
+    acc_rbf = svm_rbf.score(X_val_k, y_val_k)
+    rbf_results[c] = acc_rbf
+
+# Logistic regression benchmark.
+log_reg_val = LogisticRegression()
+log_reg_val.fit(X_train_k, y_train_k)
+acc_log_reg = log_reg_val.score(X_val_k, y_val_k)
+
+print(f"Logistic Regression Accuracy: {acc_log_reg:.4f}")
+print(f"SVM Linear Kernel Accuracy: {acc_linear:.4f}")
+for c, acc in rbf_results.items():
+    print(f"SVM RBF Kernel (C={c}) Accuracy: {acc:.4f}")
+```
+
+If the RBF kernel performs better than the linear kernel, this suggests that the relationship between the predictors and default risk is not purely linear. In that case, a curved decision boundary can separate the classes more effectively than a straight line. This would be plausible if default risk depends on interactions, nonlinear effects, or threshold behavior in the borrower characteristics.
+
+
+```{python}
+# Task 3.5
+import numpy as np
+X = X_train[["debt_to_income", "credit_utilization"]].values
+y = y_train.values.ravel()
+
+logisticRegr = LogisticRegression(l1_ratio=0, solver='liblinear')
+model_3_5_1 = logisticRegr.fit(X, y)
+y_score = model_3_5_1.predict(X)
+print('Error rate:', np.mean(np.not_equal(model_3_5_1.predict(X), y)))
+
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+import matplotlib.patches as mpatches
+plot_symbol_size = 50
+cmap_bold = ListedColormap(['#FF0000', '#0000FF'])
+plt.figure(figsize=(9, 5))
+plt.scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=y, cmap=cmap_bold, edgecolor='black')
+plt.xlabel("debt_to_income")
+plt.ylabel("credit_utilization")
+plt.title("Scatterplot")
+patch0 = mpatches.Patch(color='#FF0000', label='Y=0')
+patch1 = mpatches.Patch(color='#0000FF', label='Y=1')
+plt.legend(handles=[patch0, patch1])
+plt.show()
+```
+
+```{python}
+Y = y
+pen = 'l2'
+solv = 'liblinear'
+# Create color maps.
+cmap_light = ListedColormap(['#FFAAAA', '#AAAAFF'])
+cmap_bold = ListedColormap(['#FF0000', '#0000FF'])
+
+mesh_step_size = .01
+plot_symbol_size = 50
+
+x_min, x_max = X[:, 0].min(), X[:, 0].max()
+y_min, y_max = X[:, 1].min(), X[:, 1].max()
+xx, yy = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
+                     np.arange(y_min, y_max, mesh_step_size))
+Z = model_3_5_1.predict(np.c_[xx.ravel(), yy.ravel()])
+D = model_3_5_1.decision_function(np.c_[xx.ravel(), yy.ravel()])
+D = D.reshape(xx.shape)
+
+Z = Z.reshape(xx.shape)
+plt.figure(3, figsize=(9, 6))
+plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
+
+plt.scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y, cmap=cmap_bold, edgecolor='black')
+plt.xlim(xx.min(), xx.max())
+plt.ylim(yy.min(), yy.max())
+
+patch0 = mpatches.Patch(color='#FF0000', label='Y=0')
+patch1 = mpatches.Patch(color='#0000FF', label='Y=1')
+plt.legend(handles=[patch0, patch1])
+plt.contour(xx, yy, D, levels=[0], colors='w', linestyles=['-'], linewidths=2)
+plt.xlabel('debt_to_income')
+plt.ylabel('credit_utilization')
+plt.title("Two-class classification with logistic regression")
+plt.show()
+```
+
+```{python}
+from sklearn import svm
+supvecma = svm.SVC(kernel='rbf', C=3)
+model_3_5_2 = supvecma.fit(X, Y)
+print('Error rate:', np.mean(np.not_equal(model_3_5_2.predict(X), y)))
+from matplotlib.colors import ListedColormap
+import matplotlib.patches as mpatches
+Y = y
+
+cmap_light2 = ListedColormap(['#FFAAAA', '#AAAAFF'])
+cmap_bold2 = ListedColormap(['#FF0000', '#0000FF'])
+
+mesh_step_size = .01
+plot_symbol_size = 50
+
+x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
+y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
+xx, y_grid = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
+                         np.arange(y_min, y_max, mesh_step_size))
+Z = model_3_5_2.predict(np.c_[xx.ravel(), y_grid.ravel()])
+D = model_3_5_2.decision_function(np.c_[xx.ravel(), y_grid.ravel()])
+D = D.reshape(xx.shape)
+Z = Z.reshape(xx.shape)
+
+plt.figure(3, figsize=(9, 6))
+plt.pcolormesh(xx, y_grid, Z, cmap=cmap_light2)
+plt.scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y, cmap=cmap_bold2, edgecolor='black')
+plt.xlim(xx.min(), xx.max())
+plt.ylim(y_grid.min(), y_grid.max())
+
+patch0 = mpatches.Patch(color='#FF0000', label='Y=0')
+patch1 = mpatches.Patch(color='#0000FF', label='Y=1')
+plt.legend(handles=[patch0, patch1])
+plt.contour(xx, y_grid, D, levels=[0], colors='w', linestyles=['-'], linewidths=2)
+plt.xlabel('debt_to_income')
+plt.ylabel('credit_utilization')
+plt.title("Classification with an RBF-SVM")
+plt.show()
+```
+
+```{python}
+# Task 3.6
+
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+randforest = RandomForestClassifier(max_depth=5, random_state=0)
+model_3_6 = randforest.fit(X_train, y_train.values.ravel())
+print("Error rate:", np.mean(model_3_6.predict(X_train) != y_train.values.ravel()))
+importance = pd.DataFrame([model_3_6.feature_importances_], index=["importance"], columns=X_train.columns).T.sort_values(by="importance", ascending=False)
+importance.head()
+```
+
+The leading variables from the random forest importance ranking are broadly in line with the earlier logistic-regression results, even if the exact order differs. This is reassuring because two different model classes point to a similar set of important predictors.
+
+```{python}
+# Task 3.7a
+from sklearn.model_selection import KFold
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import log_loss
+
+# Use scaled predictors for the model comparison.
+X = X_train_scaled
+y = y_train.values.ravel()
+
+kf = KFold(n_splits=5, shuffle=True, random_state=12883823)
+acc_log_reg_3_7 = []
+acc_knn_3_7 = []
+acc_svm_3_7 = []
+acc_rf_3_7 = []
+
+ll_log_reg_3_7 = []
+ll_knn_3_7 = []
+ll_svm_3_7 = []
+ll_rf_3_7 = []
+
+for train, test in kf.split(X):
+    X_train_3_7, X_test_3_7, y_train_3_7, y_test_3_7 = X[train], X[test], y[train], y[test]
+
+    model_3_7_1 = LogisticRegression().fit(X_train_3_7, y_train_3_7)
+    acc_log_reg_3_7.append(accuracy_score(y_test_3_7, model_3_7_1.predict(X_test_3_7)))
+    ll_log_reg_3_7.append(log_loss(y_test_3_7, model_3_7_1.predict_proba(X_test_3_7)))
+
+    model_3_7_2 = KNeighborsClassifier(n_neighbors=20, weights='distance').fit(X_train_3_7, y_train_3_7)
+    acc_knn_3_7.append(accuracy_score(y_test_3_7, model_3_7_2.predict(X_test_3_7)))
+    ll_knn_3_7.append(log_loss(y_test_3_7, model_3_7_2.predict_proba(X_test_3_7)))
+
+    model_3_7_3 = SVC(kernel='rbf', C=10, probability=True).fit(X_train_3_7, y_train_3_7)
+    acc_svm_3_7.append(accuracy_score(y_test_3_7, model_3_7_3.predict(X_test_3_7)))
+    ll_svm_3_7.append(log_loss(y_test_3_7, model_3_7_3.predict_proba(X_test_3_7)))
+
+    model_3_7_4 = RandomForestClassifier(max_depth=5, random_state=0).fit(X_train_3_7, y_train_3_7)
+    y_pred_3_7_4 = model_3_7_4.predict(X_test_3_7)
+    acc_rf_3_7.append(accuracy_score(y_test_3_7, y_pred_3_7_4))
+    ll_rf_3_7.append(log_loss(y_test_3_7, model_3_7_4.predict_proba(X_test_3_7)))
+
+print(f"Average Accuracy Logistic Regression: {np.mean(acc_log_reg_3_7):.2%}")
+print(f"Average Accuracy KNN: {np.mean(acc_knn_3_7):.2%}")
+print(f"Average Accuracy SVM: {np.mean(acc_svm_3_7):.2%}")
+print(f"Average Accuracy Random Forest: {np.mean(acc_rf_3_7):.2%}")
+print(f"Average Log Loss Logistic Regression: {np.mean(ll_log_reg_3_7):.2f}")
+print(f"Average Log Loss KNN: {np.mean(ll_knn_3_7):.2f}")
+print(f"Average Log Loss SVM: {np.mean(ll_svm_3_7):.2f}")
+print(f"Average Log Loss Random Forest: {np.mean(ll_rf_3_7):.2f}")
+```
+
+The cross-validated comparison points to Random Forest as the strongest model in this notebook. It achieves the best overall performance not only in terms of accuracy but also in terms of log loss. That matters because accuracy alone ignores how confident the predicted probabilities are. Two models can have the same number of correct classifications, while one produces much more sensible probability estimates. Looking at both measures therefore gives a fairer comparison. In our results, Random Forest performs best on both dimensions, so it is the most convincing choice for the final prediction task.
+
+```{python}
+# Task 3.8
+X_test_3_8 = pd.read_csv("../Daten//X_test.csv", index_col=0)
+print(X_test_3_8)
+# Random Forest performed best in Task 3.7, so we use it for the final predictions.
+y_test_pred = model_3_6.predict_proba(X_test_3_8)
+
+model_3_6.classes_
+predictions = y_test_pred[:, 1]
+print(predictions)
+pd.Series(predictions).to_csv("../Daten//predictions.csv", header=["probability"], index_label="id")
+```
+
+\clearpage
+
+# Declaration of Authenticity
+
+> “We/I hereby certify that We/I have independently prepared the foregoing paper without external assistance and have not used any aids other than those indicated in the attached list. All passages taken verbatim or in substance from publications have been marked as such. Furthermore, We/I certify that We/I have not previously submitted this paper in any other examination procedure.”
+
+\vspace{2cm}
+
+**Hamburg, 20.03.2026, Niclas Schwarzbach (1)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+\vspace{2cm}
+
+**Place, Date, Signature (2)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+\vspace{2cm}
+
+**Place, Date, Signature (3)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
+
+\vspace{2cm}
+
+**Place, Date, Signature (4)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_

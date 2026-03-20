@@ -200,9 +200,9 @@ def trimmed_mean(x, pct):
 
 price_mean_trimmed = trimmed_mean(listings_1_8["price"], 5)
 price_mean = listings_1_8["price"].mean()
-print(f"The 5% trimmed mean of price is: {price_mean_trimmed:.2f}. The standard mean of price is: {price_mean:.2f}. This is an increase of {(price_mean-price_mean_trimmed)/price_mean*100:.2f}%.")
+print(f"The 5% trimmed mean of price is: {price_mean_trimmed:.2f}. The arithmetic mean of price is: {price_mean:.2f}. This is an increase of {(price_mean-price_mean_trimmed)/price_mean*100:.2f}%.")
 
-print("The trimmed mean is lower because a small number of very expensive listings pull the standard mean upward. In this setting the trimmed mean gives a more robust picture of a typical listing price.")
+print("The trimmed mean is lower because a small number of very expensive listings pull the arithmetic mean upward. In this setting the trimmed mean gives a more robust picture of a typical listing price.")
 ```
 
 ```{python}
@@ -222,14 +222,15 @@ def clean_amenities(amenities_str):
 # We apply the function to our dataset and calculate the number of entries per list. 
 listings_1_8["amenities_list"] = listings_1_8["amenities"].apply(clean_amenities)
 listings_1_8["amenities_count"] = listings_1_8["amenities_list"].apply(len)
+# do the same for the full dataset from 1_5
+listings_1_5["amenities_list"] = listings_1_5["amenities"].apply(clean_amenities)
+listings_1_5["amenities_count"] = listings_1_5["amenities_list"].apply(len)
 listings_1_8[["amenities", "amenities_list", "amenities_count"]].head(3)
 ```
 
 ```{python}
 # Task 1.9
-listings_1_5["amenities_list"] = listings_1_5["amenities"].apply(clean_amenities)
-listings_1_5["amenities_count"] = listings_1_5["amenities_list"].apply(len)
-
+# we load the full data set from 1_5, so we can see the outliers in the plots. 
 listings_1_9 = listings_1_5.copy()
 
 fig, ax = plt.subplots(2, 2, figsize=(11, 7), dpi=200)
@@ -277,7 +278,13 @@ print("Hotel room shared bath rate:",(listings_1_9.loc[listings_1_9["room_type"]
 print("Private room shared bath rate:",(listings_1_9.loc[listings_1_9["room_type"]=="Private room"]["Shared_bath_status"]==True).mean())
 ```
 
-The first plot shows large price differences across room types. Shared rooms are clearly the cheapest, private rooms come next, and entire homes or hotel rooms tend to be more expensive. Shared bathrooms are mainly relevant for private rooms and hotel rooms, and listings with shared bathrooms are usually priced lower.
+!!!!!!!!!!!!!!!!!!
+
+The first plot shows large price differences across room types. Shared rooms are clearly the cheapest, private rooms come next, and entire homes or hotel rooms tend to be more expensive. Shared bathrooms are optionally available for private rooms and hotel rooms, and listings with shared bathrooms are usually priced lower for private rooms. Unexpectatly, hotel rooms with a shared bath have a higher median price than those with private ones. It should be noted however, that only 5.5% of hotel rooms have a shared bathroom setup, compared to 56.9% of private rooms. Thus the validity of that trend suffers from a lower sample size, which the violin plot misleadingly portrais as similar to it's counterpart's. 
+
+!!!!!!!!!!!!!!!!!!
+
+The first plot shows that there are four types of bookables listed on AirBnB. Shared rooms make up the cheapest available type of rental unit with the lowest positioned distribution, followed by the private rooms and then apartments, with hotel rooms tending to be the most expensive. Logically, only private rooms and hotel rooms are optionally available with a shared bathroom, with apartments never and shared rooms only having them. As could be expected, shared room type AirBnBs tend to be cheaper than those with private bathrooms. Unexpectatly, hotel rooms with a shared bath have a higher median price than those with private ones. It should be noted however, that only 5.5% of hotel rooms have a shared bathroom setup, compared to 56.9% of private rooms. Thus the validity of that trend suffers from a lower sample size, which the violin plot misleadingly portrais as similar to it's counterpart's. 
 
 The second plot suggests that both superhost status and instant booking are associated with higher prices. The pattern is visible in both boxplots, although the differences are not equally strong.
 
@@ -285,19 +292,8 @@ The third plot shows a clear positive relationship between the number of accommo
 
 The fourth plot indicates a positive relationship between the number of amenities and price. The trend is not perfect, but the fitted line points upward, which suggests that more heavily equipped listings tend to charge more.
 
-```{python}
-# Run with the "" counting method used for 1_9 and the ast method for 1_8
-n_1_8 = 0
-n_1_9 = 0
-for idx in listings_1_8.index:
-    n_1_8 += listings_1_8.loc[idx, "amenities_count"]
-    n_1_9 += listings_1_9.loc[idx, "amenities_count"]
-print(f"Total amenities count in listings_1_8: {n_1_8}")
-print(f"Total amenities count in listings_1_9: {n_1_9}")
-print(listings_1_8["amenities_count"].sum())
-print(listings_1_9["amenities_count"].sum())
-print(listings_1_9.loc[listings_1_9["price"] > upper_bound, "amenities_count"].sum())
-```
+The fourth plot portrais the dataset in relation to price and the number of items listed in the amenities section. Throughout the cluster, a slight but meaningful positive correlation can be observed, backed up by the robust regression line. Additionaly the figure shows that superhosts tend to list more amenities. A superhost premium beyond the regressed amenities related price increase is not clearly visible in the plot.
+
 
 ```{python}
 # Optional extra plots for Section 1
@@ -338,21 +334,6 @@ plt.show()
 
 The Berlin Airbnb market shows a clear price gradient across listing characteristics. Room type is one of the strongest factors: shared rooms are cheapest, while entire homes and hotel rooms are more expensive. Capacity also matters a lot, since listings for more guests tend to have substantially higher prices. In addition, listings with more amenities are usually more expensive, which suggests that quality and equipment are reflected in pricing. Superhost status and instant booking also seem to be associated with a price premium, although these effects are less pronounced than room type or capacity. Spatially, central areas often combine high listing density with comparatively high prices, but the relationship is not perfect. Some peripheral regions also show high median prices, likely because they contain fewer listings and are therefore more sensitive to individual outliers. Overall, listing size, type, amenities, and location seem to matter most for prices.
 
-```{python}
-listings_1_9[["bedrooms", "room_type","amenities_count"]].head()
-```
-
-```{python}
-# Task 1.11
-
-import json
-
-with open("../Daten/berlin_bezirke.geojson", "r", encoding="utf-8") as f:
-    berlin_geojson = json.load(f)
-
-print(len(berlin_geojson["features"]))
-berlin_geojson["features"][0].keys()
-```
 
 ```{python}
 # Task 1.11: match region information from the Airbnb data to the GeoJSON data
@@ -547,7 +528,7 @@ The following markdown cell was kept in the original notebook as a draft note. T
 The maps suggest a clear centre–periphery pattern. Listing density is much higher in central Berlin than in the outer parts of the city. This is plausible because central areas are closer to tourist attractions, nightlife, restaurants, and major transport links. Median prices also tend to be higher in the centre, but the pattern is less clean than for density. Some non-central Bezirksregionen show relatively high median prices as well. These values should be read carefully, since they may be driven by a limited number of listings rather than a broad market pattern. Overall, centrality seems to matter strongly for where Airbnb listings are concentrated, while prices are shaped by a mix of location, local demand, and listing-specific features such as size and amenities.
 
 ```{python}
-#listings_1_13.to_csv("listings_1_13.csv")
+listings_1_13.to_csv("listings_1_13.csv")
 ```
 
 \clearpage

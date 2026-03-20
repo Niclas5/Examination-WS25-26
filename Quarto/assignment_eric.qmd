@@ -686,7 +686,14 @@ for lam in lambdas:
     print("-" * 30)
 ```
 
-The l_2-norm ||β||_2 = 3.513462 is the smallest für the Ridge regression model at lambda=100, which suggests that it has the most regularization effect among the three models. This is expected, as Ridge regression adds a penalty term to the loss function that shrinks the coefficients towards zero, thus reducing their magnitude. The Lasso regression model has a larger l_2-norm than Ridge, but still smaller than the OLS model, indicating that it also applies some regularization but allows for some coefficients to be exactly zero. 
+
+The choice of epsilon in LassoCV directly affects the selected regularization strength α and therefore the resulting model. With the default setting (epsilon = 1e−3), the selected α is relatively large, which leads to strong regularization. In this case, several coefficients are pushed exactly to zero, specifically bedrooms, host_is_superhost, Shared_bath_status, instant_bookable, and distance_center, resulting in a sparse model that retains only a small subset of predictors.
+
+When ε is reduced to a very small value (around 1e−12), the selected α becomes extremely small. As a result, Lasso behaves almost identically to OLS: coefficients are barely shrunk, no variables are eliminated, and the l_2-norm remains close to the OLS solution. This indicates that there is effectively no regularization.
+
+In comparison, OLS includes all variables without any shrinkage, while Ridge reduces coefficient magnitudes as lambda increases but never sets them to zero. Lasso differs in that it can both shrink coefficients and eliminate variables entirely. Overall, the results show that Lasso transitions from an OLS-like model without sparsity to a sparse model with variable selection as the regularization strength increases, with epsilon indirectly controlling this behavior through its influence on α.
+
+For the Minimum of the Average MSE to show, eps must be set to a the value of ~1e-12. This results in a very small alpha, which is the regalurization strength. The small alpha indicates that the model is very close to an OLS regression, which is consistent with the fact that the lasso coefficients are not heavily shrunk towards zero. The fact that some coefficients are exactly zero suggests that the lasso has identified certain features as less relevant for predicting the outcome, while still allowing other features to have non-zero coefficients. The extension to eps=1e-12 would result therefore in zero "Zero-coefficients" and only Non-zero coefficients.
 
 ```{python}
 # Task 2_5

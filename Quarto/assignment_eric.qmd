@@ -685,13 +685,14 @@ for lam in lambdas:
     print(f"Coefficients (excerpt): {beta_hat[:3]}")
     print("-" * 30)
 
-
-#For this task, we made more extensive use of AI-based assistance due to initial difficulties in implementing the required approach. The AI support was used to better understand the methodology and guide the implementation process.
-
-#All results, interpretations, and final code were reviewed, adapted, and validated by us. We ensured full comprehension of the applied methods and take responsibility for the presented work. The use of AI served as a learning aid rather than a substitute for our own contribution.
 ```
 
 
+::: {.callout-note appearance="minimal"}
+For this task, we made more extensive use of AI-based assistance due to initial difficulties in implementing the required approach. The AI support was used to better understand the methodology and guide the implementation process.
+
+All results, interpretations, and final code were reviewed, adapted, and validated by us. We ensured full comprehension of the applied methods and take responsibility for the presented work. The use of AI served as a learning aid rather than a substitute for our own contribution.
+:::
 The choice of epsilon in LassoCV directly affects the selected regularization strength α and therefore the resulting model. With the default setting (epsilon = 1e−3), the selected α is relatively large, which leads to strong regularization. In this case, several coefficients are pushed exactly to zero, specifically bedrooms, host_is_superhost, Shared_bath_status, instant_bookable, and distance_center, resulting in a sparse model that retains only a small subset of predictors.
 
 When ε is reduced to a very small value (around 1e−12), the selected α becomes extremely small. As a result, Lasso behaves almost identically to OLS: coefficients are barely shrunk, no variables are eliminated, and the l_2-norm remains close to the OLS solution. This indicates that there is effectively no regularization.

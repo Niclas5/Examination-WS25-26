@@ -680,16 +680,6 @@ plt.tight_layout()
 plt.show()
 ```
 
-alter Text:
-
-If the standard automatic alpha selection procedure is used (see (b)), it uses the the default epsilon value of 1e-3, which is relatively large. In that case, the selected alpha is much larger than with a smaller epsilon, which leads to more aggressive regularization and more coefficients being pushed to zero. 
-The features: 'bedrooms', 'host_is_superhost', 'Shared_bath_status', 'instant_bookable', 'distance_center'are being set at zero.
-For the Minimum of the Average MSE to show, eps must be set to a the value of ~1e-12 (see (a)). This results in a very small alpha, which is the regalurization strength. The small alpha indicates that the model is very close to an OLS regression, which is consistent with the fact that the lasso coefficients are not heavily shrunk towards zero. The fact that some coefficients are exactly zero suggests that the lasso has identified certain features as less relevant for predicting the outcome, while still allowing other features to have non-zero coefficients. The extension to eps=1e-12 would result therefore in zero "Zero-coefficients" and only Non-zero coefficients. The model is thus very close to an OLS regression, without any significant regularization effect. This is consistent with the fact that the l_2-norm of the coefficients is not much smaller than that of the OLS model, indicating that the coefficients are not heavily shrunk towards zero.
-
-With a very small epsilon, the selected alpha is also very small, so the Lasso solution stays close to OLS. In that case the regularization effect is weak and only limited coefficient shrinkage occurs. This suggests that the data do not strongly support a sparse model in which many predictors should be pushed exactly to zero.
-
-Erics neuer Text:
-
 The choice of epsilon in LassoCV directly affects the selected regularization strength α and therefore the resulting model. With the default setting (epsilon = 1e−3), the selected α is relatively large, which leads to strong regularization. In this case, several coefficients are pushed exactly to zero, specifically bedrooms, host_is_superhost, Shared_bath_status, instant_bookable, and distance_center, resulting in a sparse model that retains only a small subset of predictors.
 
 When ε is reduced to a very small value (around 1e−12), the selected α becomes extremely small. As a result, Lasso behaves almost identically to OLS: coefficients are barely shrunk, no variables are eliminated, and the l_2-norm remains close to the OLS solution. This indicates that there is effectively no regularization.
@@ -731,7 +721,8 @@ print("Average RMSE Ridge:", np.mean(rmse_ridge))
 print("Average RMSE Lasso:", np.mean(rmse_lasso))
 ```
 
-The cross-validated RMSE values are close to each other, but Lasso performs somewhat worse in this setting. This fits the structure of the problem: the predictor set is not especially sparse, so forcing coefficients toward zero can remove useful information. OLS and Ridge are therefore more natural benchmarks here, while Lasso is less attractive for prediction.
+OLS and Ridge achieve nearly identical out-of-sample performance, indicating that regularization does not improve predictive accuracy. Lasso performs substantially worse due to aggressive variable selection, which removes relevant predictors and leads to underfitting.
+The inferior performance of Lasso indicates that the underlying model is not sparse. Many predictors contribute to the outcome, so enforcing sparsity removes relevant information and increases prediction error. In contrast, OLS and Ridge retain all variables, which better reflects the data structure.
 
 
 Task 2.7:
@@ -826,14 +817,14 @@ print("Top 3 features by absolute coefficient:")
 print(coef_df.head(3))
 ```
 
-After standardization, the coefficients can be compared more directly because all variables are measured on the same scale. A positive coefficient indicates that higher values of the feature are associated with a higher probability of default, while a negative coefficient points in the opposite direction. The variables with the largest absolute coefficients are therefore the strongest predictors in the logistic model.
+After standardization, the coefficients can be compared more directly because all variables are measured on the same scale. A positive coefficient indicates that higher values of the feature are associated with a higher probability of default, while a negative coefficient points in the opposite direction. The variables with the largest absolute coefficients are therefore the strongest predictors in the logistic model. 
+The features with the largest absolute coefficients are debt_to_income, credit_utilization, and previous_defaults. They indicate that default risk is mainly driven by a borrower’s financial burden, current credit usage, and past behavior. A high debt-to-income ratio is the strongest predictor, suggesting that individuals with higher relative debt are much more likely to default. High credit utilization further increases risk by indicating financial strain, while previous defaults highlight that past repayment behavior is a strong indicator of future default.
 
 
 ```{python}
 # Task 3.3
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
-import pandas as pd
 
 # Split the data into training and validation sets.
 X_train_k, X_val_k, y_train_k, y_val_k = train_test_split(
@@ -864,14 +855,12 @@ knn_results_df = pd.DataFrame(results)
 print(knn_results_df)
 ```
 
-KNN is strongly affected by the scale of the predictors because classification is based on distances between observations. After standardization, the method becomes more meaningful, but the results still depend on the choice of \(k\). Smaller values of \(k\) react more strongly to local variation, whereas larger values produce a smoother and more stable decision rule.
+The results show only small differences across the different KNN specifications. The best performance is achieved with k = 50 and distance-based weighting, resulting in an error rate of 0.308. In general, larger values of k perform slightly better than smaller ones. This is consistent with the idea that larger k values produce smoother and more stable decision boundaries, reducing sensitivity to noise in the data. Distance weighting also leads to marginal improvements, as closer neighbors receive more influence than distant ones. KNN may struggle with this dataset due to the relatively high dimensionality (20 features). In high-dimensional spaces, distances between observations become less informative, which makes it harder to identify truly similar neighbors. As a result, the classification performance remains limited even after tuning k and the weighting scheme.
 
 
 ```{python}
 # Task 3.4
 from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
 
 # Fit SVM with a linear kernel.
 svm_linear = SVC(kernel='linear')
@@ -898,8 +887,7 @@ print(f"SVM Linear Kernel Accuracy: {acc_linear:.4f}")
 for c, acc in rbf_results.items():
     print(f"SVM RBF Kernel (C={c}) Accuracy: {acc:.4f}")
 ```
-
-If the RBF kernel performs better than the linear kernel, this suggests that the relationship between the predictors and default risk is not purely linear. In that case, a curved decision boundary can separate the classes more effectively than a straight line. This would be plausible if default risk depends on interactions, nonlinear effects, or threshold behavior in the borrower characteristics.
+Tthe RBF kernel performs better than the linear kernel. If this is the case, it suggests that the relationship between the predictors and default risk is not purely linear. In that case, a curved decision boundary can separate the classes more effectively than a straight line. This would be plausible if default risk depends on interactions, nonlinear effects, or threshold behavior in the borrower characteristics.
 
 
 ```{python}
@@ -930,107 +918,112 @@ plt.show()
 ```
 
 ```{python}
-Y = y
-pen = 'l2'
-solv = 'liblinear'
-# Create color maps.
-cmap_light = ListedColormap(['#FFAAAA', '#AAAAFF'])
-cmap_bold = ListedColormap(['#FF0000', '#0000FF'])
-
-mesh_step_size = .01
-plot_symbol_size = 50
-
-x_min, x_max = X[:, 0].min(), X[:, 0].max()
-y_min, y_max = X[:, 1].min(), X[:, 1].max()
-xx, yy = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
-                     np.arange(y_min, y_max, mesh_step_size))
-Z = model_3_5_1.predict(np.c_[xx.ravel(), yy.ravel()])
-D = model_3_5_1.decision_function(np.c_[xx.ravel(), yy.ravel()])
-D = D.reshape(xx.shape)
-
-Z = Z.reshape(xx.shape)
-plt.figure(3, figsize=(9, 6))
-plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
-
-plt.scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y, cmap=cmap_bold, edgecolor='black')
-plt.xlim(xx.min(), xx.max())
-plt.ylim(yy.min(), yy.max())
-
-patch0 = mpatches.Patch(color='#FF0000', label='Y=0')
-patch1 = mpatches.Patch(color='#0000FF', label='Y=1')
-plt.legend(handles=[patch0, patch1])
-plt.contour(xx, yy, D, levels=[0], colors='w', linestyles=['-'], linewidths=2)
-plt.xlabel('debt_to_income')
-plt.ylabel('credit_utilization')
-plt.title("Two-class classification with logistic regression")
-plt.show()
-```
-
-```{python}
-from sklearn import svm
-supvecma = svm.SVC(kernel='rbf', C=3)
-model_3_5_2 = supvecma.fit(X, Y)
-print('Error rate:', np.mean(np.not_equal(model_3_5_2.predict(X), y)))
+import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import matplotlib.patches as mpatches
+from sklearn import svm
+
 Y = y
 
-cmap_light2 = ListedColormap(['#FFAAAA', '#AAAAFF'])
-cmap_bold2 = ListedColormap(['#FF0000', '#0000FF'])
 
-mesh_step_size = .01
+cmap_light = ListedColormap(['#FFAAAA', '#AAAAFF'])
+cmap_bold  = ListedColormap(['#FF0000', '#0000FF'])
+
+mesh_step_size = 0.01
 plot_symbol_size = 50
 
 x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
 y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
-xx, y_grid = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
-                         np.arange(y_min, y_max, mesh_step_size))
-Z = model_3_5_2.predict(np.c_[xx.ravel(), y_grid.ravel()])
-D = model_3_5_2.decision_function(np.c_[xx.ravel(), y_grid.ravel()])
-D = D.reshape(xx.shape)
-Z = Z.reshape(xx.shape)
+xx, yy = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
+                     np.arange(y_min, y_max, mesh_step_size))
 
-plt.figure(3, figsize=(9, 6))
-plt.pcolormesh(xx, y_grid, Z, cmap=cmap_light2)
-plt.scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y, cmap=cmap_bold2, edgecolor='black')
-plt.xlim(xx.min(), xx.max())
-plt.ylim(y_grid.min(), y_grid.max())
+fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+# Logistic Regression
+Z_lr = model_3_5_1.predict(np.c_[xx.ravel(), yy.ravel()])
+D_lr = model_3_5_1.decision_function(np.c_[xx.ravel(), yy.ravel()])
+Z_lr = Z_lr.reshape(xx.shape)
+D_lr = D_lr.reshape(xx.shape)
+
+axes[0].pcolormesh(xx, yy, Z_lr, cmap=cmap_light)
+axes[0].scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y,
+                cmap=cmap_bold, edgecolor='black')
+axes[0].contour(xx, yy, D_lr, levels=[0], colors='w', linewidths=2)
+
+axes[0].set_title("Logistic Regression")
+axes[0].set_xlabel('debt_to_income')
+axes[0].set_ylabel('credit_utilization')
+axes[0].set_xlim(xx.min(), xx.max())
+axes[0].set_ylim(yy.min(), yy.max())
+
+# SVM
+supvecma = svm.SVC(kernel='rbf', C=3)
+model_3_5_2 = supvecma.fit(X, Y)
+
+print('Error rate:', np.mean(np.not_equal(model_3_5_2.predict(X), y)))
+
+Z_svm = model_3_5_2.predict(np.c_[xx.ravel(), yy.ravel()])
+D_svm = model_3_5_2.decision_function(np.c_[xx.ravel(), yy.ravel()])
+Z_svm = Z_svm.reshape(xx.shape)
+D_svm = D_svm.reshape(xx.shape)
+
+axes[1].pcolormesh(xx, yy, Z_svm, cmap=cmap_light)
+axes[1].scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y,
+                cmap=cmap_bold, edgecolor='black')
+axes[1].contour(xx, yy, D_svm, levels=[0], colors='w', linewidths=2)
+
+axes[1].set_title("SVM (RBF kernel, C=3)")
+axes[1].set_xlabel('debt_to_income')
+axes[1].set_ylabel('credit_utilization')
+axes[1].set_xlim(xx.min(), xx.max())
+axes[1].set_ylim(yy.min(), yy.max())
 
 patch0 = mpatches.Patch(color='#FF0000', label='Y=0')
 patch1 = mpatches.Patch(color='#0000FF', label='Y=1')
-plt.legend(handles=[patch0, patch1])
-plt.contour(xx, y_grid, D, levels=[0], colors='w', linestyles=['-'], linewidths=2)
-plt.xlabel('debt_to_income')
-plt.ylabel('credit_utilization')
-plt.title("Classification with an RBF-SVM")
+fig.legend(handles=[patch0, patch1], loc='upper right')
+
+plt.tight_layout()
 plt.show()
 ```
 
-```{python}
-# Task 3.6
+This comparison shows that logistic regression is relatively rigid and may underfit when the relationship between debt-to-income and credit utilization is nonlinear, since it produces a linear decision boundary. The RBF-SVM, on the other hand generates a nonlinear and more flexible boundary, that adapts to the structure of the data and better captures regions with higher default risk.
 
-import numpy as np
+
+```{python}
+
+#Aufgabe 3_6
 from sklearn.ensemble import RandomForestClassifier
+#visualize top 5 values
 randforest = RandomForestClassifier(max_depth=5, random_state=0)
 model_3_6 = randforest.fit(X_train, y_train.values.ravel())
 print("Error rate:", np.mean(model_3_6.predict(X_train) != y_train.values.ravel()))
-importance = pd.DataFrame([model_3_6.feature_importances_], index=["importance"], columns=X_train.columns).T.sort_values(by="importance", ascending=False)
-importance.head()
+importance=pd.DataFrame([model_3_6.feature_importances_],index=["importance"], columns=X_train.columns).T.sort_values(by="importance", ascending=False)
+print(importance.head())
+
+#Function to play around
+def rand_for_var(n_estimat, max_dep):
+    randforest = RandomForestClassifier(max_depth=max_dep, random_state=0, n_estimators=n_estimat)
+    model_3_6 = randforest.fit(X_train, y_train.values.ravel())
+    print("Error rate:", np.mean(model_3_6.predict(X_train) != y_train.values.ravel()))
+    return 
+
+for n in [1, 10, 100]:
+    print("-"*30)
+    print(f"n_estimators = {n}")
+    print(rand_for_var(n, 5))
+
+for max in [5, 20, 50]:
+    print("-"*30)
+    print(f"max_depth = {max}")
+    print(rand_for_var(10, max))
+
 ```
+
 
 The leading variables from the random forest importance ranking are broadly in line with the earlier logistic-regression results, even if the exact order differs. This is reassuring because two different model classes point to a similar set of important predictors.
 
 ```{python}
 # Task 3.7a
-from sklearn.model_selection import KFold
-from sklearn.linear_model import LogisticRegression
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import log_loss
 
 # Use scaled predictors for the model comparison.
@@ -1055,15 +1048,16 @@ for train, test in kf.split(X):
     acc_log_reg_3_7.append(accuracy_score(y_test_3_7, model_3_7_1.predict(X_test_3_7)))
     ll_log_reg_3_7.append(log_loss(y_test_3_7, model_3_7_1.predict_proba(X_test_3_7)))
 
-    model_3_7_2 = KNeighborsClassifier(n_neighbors=20, weights='distance').fit(X_train_3_7, y_train_3_7)
+    model_3_7_2 = KNeighborsClassifier(n_neighbors=50, weights='distance').fit(X_train_3_7, y_train_3_7)
     acc_knn_3_7.append(accuracy_score(y_test_3_7, model_3_7_2.predict(X_test_3_7)))
     ll_knn_3_7.append(log_loss(y_test_3_7, model_3_7_2.predict_proba(X_test_3_7)))
 
-    model_3_7_3 = SVC(kernel='rbf', C=10, probability=True).fit(X_train_3_7, y_train_3_7)
+    model_3_7_3 = SVC(kernel='rbf', C=1, probability=True).fit(X_train_3_7, y_train_3_7)
     acc_svm_3_7.append(accuracy_score(y_test_3_7, model_3_7_3.predict(X_test_3_7)))
     ll_svm_3_7.append(log_loss(y_test_3_7, model_3_7_3.predict_proba(X_test_3_7)))
 
-    model_3_7_4 = RandomForestClassifier(max_depth=5, random_state=0).fit(X_train_3_7, y_train_3_7)
+    # For the random forest classifier, we limited the depth of 11 in order to in order to combat overfit. 
+    model_3_7_4 = RandomForestClassifier(max_depth=11, random_state=0).fit(X_train_3_7, y_train_3_7)
     acc_rf_3_7.append(accuracy_score(y_test_3_7, model_3_7_4.predict(X_test_3_7)))
     ll_rf_3_7.append(log_loss(y_test_3_7, model_3_7_4.predict_proba(X_test_3_7)))
 
@@ -1091,25 +1085,3 @@ predictions = y_test_pred[:, 1]
 print(predictions)
 pd.Series(predictions).to_csv("../Daten//predictions.csv", header=["probability"], index_label="id")
 ```
-
-\clearpage
-
-# Declaration of Authenticity
-
-> “We/I hereby certify that We/I have independently prepared the foregoing paper without external assistance and have not used any aids other than those indicated in the attached list. All passages taken verbatim or in substance from publications have been marked as such. Furthermore, We/I certify that We/I have not previously submitted this paper in any other examination procedure.”
-
-\vspace{2cm}
-
-**Hamburg, 20.03.2026, Niclas Schwarzbach (1)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-\vspace{2cm}
-
-**Place, Date, Signature (2)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-\vspace{2cm}
-
-**Place, Date, Signature (3)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_
-
-\vspace{2cm}
-
-**Place, Date, Signature (4)** \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_

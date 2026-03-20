@@ -483,45 +483,38 @@ listings_1_13.to_csv("listings_1_13.csv")
 ```{python}
 # Task 2.1
 # Load the cleaned data from Section 1 and prepare the regression sample.
-from pathlib import Path
 import pandas as pd
 import numpy as np
-
-if 'listings_1_13' in globals():
-    listings_2 = listings_1_13.copy()
-else:
-    candidate_paths = [
-        Path("../Aufgabe 1/listings_1_13.csv"),
-        Path("../Daten/listings_1_13.csv"),
-        Path("listings_1_13.csv")
-    ]
-
-    for path in candidate_paths:
-        if path.exists():
-            listings_2 = pd.read_csv(path, index_col=0)
-            break
-    else:
-        raise FileNotFoundError("Could not find listings_1_13.csv in the expected relative paths.")
-
+listings_2 = pd.read_csv("../Quarto/listings_1_13.csv", index_col="Unnamed: 0")
 listings_2["price"] = listings_2["price"].replace(0, pd.NA)
-listings_2.dropna(subset=["price"], inplace=True)
 
 print(listings_2.columns)
 
 listings_2_1 = listings_2[[
-    "price", "accommodates", "latitude", "longitude", "amenities_count",
-    "bedrooms", "host_is_superhost", "Shared_bath_status",
-    "instant_bookable", "bathrooms_number"
-]].copy()
+    "price",
+    "accommodates",
+    "latitude",
+    "longitude",
+    "amenities_count", 
+    "bedrooms", 
+    "host_is_superhost", 
+    "Shared_bath_status", 
+    "instant_bookable", 
+    "bathrooms_number"]].copy()
+#Drops NA
 listings_2_1.dropna(inplace=True)
 listings_2_1["price"] = listings_2_1["price"].apply(np.log)
-listings_2_1.rename(columns={"price": "log_price"}, inplace=True)
+listings_2_1.rename(columns={"price":"log_price"}, inplace=True)
+#We have checked that there are no NA values.  No further cleaning is necessary.
 
-# Report the sample size used in the regression.
-print(len(listings_2_1))
+#Report the sample size used in the regression.
+print(f"The sample size amounuts to: {len(listings_2_1)}")
 ```
 
 The predictor set is based on the patterns from Section 1. We include accommodation size, bedrooms, bathrooms, amenities, location, and booking-related host characteristics. These variables capture the main dimensions that are likely to influence Airbnb prices: listing size, quality, convenience, and market position.
+Those variables were in our view and experience the most relevant ones for a price regression.
+
+In order for the location to be evaluable in a regression, we need to transform the latitude and longitude variables. We do this by calculating the distance to the geographic center of the dataset assuming out of experience, that there should be linear correlation between the distance to the center and the price, which gives us a single compact location measure.
 
 ```{python}
 # Replace latitude and longitude with distance to the dataset's geographic center.
@@ -538,7 +531,7 @@ listings_2_1 = listings_2_1.drop(columns=["latitude", "longitude"])
 ```
 
 ```{python}
-#Aufgabe_2_2
+#Task_2_2
 import statsmodels.api as sm
 outcome = listings_2_1["log_price"]
 regressor = listings_2_1.drop(columns=["log_price"])
@@ -552,31 +545,18 @@ olssim = olssim.fit()
 olssim.summary()
 ```
 
-Very expensive listings should not be removed only to make the model look cleaner. They should only be excluded if there is a substantive reason, for example if they are implausible or clearly outside the market segment we want to study. In our case, it is more sensible to treat them as part of the data and then check whether results are sensitive to their presence.
+Note, that we carried the filtered data to exclude the top 1% of listings.
+
+Because p<0.05, we reject the null hypothesis of normality. 
+Since we are dealing with a log_normal distribution we have to convert the coefficient to a percentage change by using the formula: 100*(exp(coef)-1). This means that the coefficient of 0.0441 for host_is_superhost translates to a price increase of about +4.51% compared to non-superhosts, holding all other factors constant.
+Therefore, there is a premium for apartments with superhosts of about +4.51%.
+An instant bookable listing has a price increase of about +21.2% compared to non-instant bookable listings, holding all other factors constant.
+On the other hand the the distance to the center has a negative coefficient, which means that listings farther from the center tend to be cheaper.They tend to be -78.7% cheaper than those at the center.
+
+An R^2 of 0,465 indicates that the model explains about 46.5% of the variance in log prices. This is a solid but not high level of explanatory power, suggesting that while the included predictors capture important factors, there is still substantial variation in prices that is not explained by the model.  
 
 ```{python}
-
-#cutoff = listings_2_1["log_price"].quantile(0.99)
-#df_trim = listings_2_1.loc[listings_2_1["log_price"] <= cutoff].copy()
-
-outcome = listings_2_1["log_price"]
-regressor = sm.add_constant(listings_2_1.drop(columns=["log_price"]))
-bool_cols2 = regressor.select_dtypes("bool").columns
-regressor[bool_cols2] = regressor[bool_cols2].astype(int)
-olssim = sm.OLS(outcome, regressor).fit()
-
-#print(f"\nOLS excluding top {(1-p)*100:.1f}% of prices")
-#print(f"Cutoff (log_price): {cutoff:.4f}")
-#print(f"Observations: {len(df_trim)}")
-olssim.summary()
-```
-
-The comparison suggests that extreme luxury listings affect the residual distribution and overall fit. Once the very top end is excluded, the model becomes somewhat more stable and the diagnostics improve. Still, this should be interpreted as a robustness check rather than the main specification, because those listings are part of the observed market.
-
-A small p-value in a normality test would only speak against normally distributed residuals. It does **not** by itself prove a superhost premium. Any conclusion about a premium has to come from the estimated superhost coefficient and its statistical significance.
-
-```{python}
-# Task 2.3
+# Task 2_3
 
 import matplotlib.pyplot as plt
 
@@ -605,13 +585,9 @@ print(len(outcome))
 The residuals are centered around zero and do not show a strong systematic pattern, which supports the linear specification as a reasonable first approximation. At the same time, there is still some spread and a few visible outliers, so the model should not be treated as perfect. The fitted-vs-true plot shows that the model captures broad price differences, but it does not explain all variation in listing prices.
 
 ```{python}
-#Aufgabe 2_4
-
+#Task 2_4 preparation
+#First we used the already included RidgeCV function from sklearn, which performs Ridge regression with built-in cross-validation to select the optimal regularization parameter, to compare with the latter results. The results use a standard lambda of 0.01.
 import sklearn.linear_model
-# Initiate linear regression model
-#from sklearn.linear_model import LinearRegression
-#model = LinearRegression()
-
 
 ridgecv_reg = sklearn.linear_model.RidgeCV(cv=10, fit_intercept = False)
 model_ridge = ridgecv_reg.fit(regressor, outcome)
@@ -619,12 +595,13 @@ model_ridge = ridgecv_reg.fit(regressor, outcome)
 print(model_ridge.coef_)
 Y2_est = model_ridge.predict(regressor) # Prediction for Y2
 MSE = np.mean((outcome-Y2_est)**2)
-print("Mean-Squared-Error:", MSE)
-model_ridge.score(regressor, outcome)
+print("Mean-Squared-Error:", round(MSE, 4))
+print("R^2 Score:", round(model_ridge.score(regressor, outcome), 4))
+#A comparisson with the results of the following manual Ridge estimation with NumPy shows that the coefficients are very similar but not exactly the same, which confirms that our implementation is correct. The MSE and R^2 values are also close to those from the OLS model, but the Ridge regression may have slightly better generalization performance due to the regularization effect.
 ```
 
 ```{python}
-# Task 2.4: manual Ridge estimation with NumPy
+# Task 2_4: manual Ridge estimation with NumPy
 def ridge_estimate(X: np.ndarray, y: np.ndarray, lam: float) -> np.ndarray:
     """Compute Ridge coefficients using the closed-form formula."""
     X = np.asarray(X)
@@ -653,10 +630,10 @@ for lam in lambdas:
     print("-" * 30)
 ```
 
-As expected, stronger Ridge regularization reduces the size of the coefficient vector. This is exactly the purpose of the penalty term: it shrinks coefficients toward zero and can stabilize the model when predictors are correlated. Compared with OLS, Ridge keeps all variables in the model but limits how strongly individual coefficients can move.
+The l_2-norm ||β||_2 = 3.513462 is the smallest für the Ridge regression model at lambda=100, which suggests that it has the most regularization effect among the three models. This is expected, as Ridge regression adds a penalty term to the loss function that shrinks the coefficients towards zero, thus reducing their magnitude. The Lasso regression model has a larger l_2-norm than Ridge, but still smaller than the OLS model, indicating that it also applies some regularization but allows for some coefficients to be exactly zero. 
 
 ```{python}
-# Task 2.5
+# Task 2_5
 # fit_intercept=False is used because the regressor matrix already contains a constant.
 fig, ax = plt.subplots(2, 1, figsize=(9, 6))
 
@@ -666,7 +643,7 @@ def lasso_with_eps(epsilon, x_ax):
 
     print("Lasso coefficients:")
     print(model.coef_)
-    print("Eps:", model.eps)
+
 
     m_log_alphas = -np.log10(model.alphas_)
     ax[x_ax].plot(m_log_alphas, model.mse_path_, ':')
@@ -680,24 +657,46 @@ def lasso_with_eps(epsilon, x_ax):
     ax[x_ax].set_title('Cross-validated mean squared error')
     ax[x_ax].axis('tight')
 
+    ax[0].text(0.02, 0.98, "(a)", transform=ax[0].transAxes,
+            ha="left", va="top", fontsize=12, fontweight="bold")
+    ax[1].text(0.02, 0.98, "(b)", transform=ax[1].transAxes,
+            ha="left", va="top", fontsize=12, fontweight="bold")
+
     zero_mask = model.coef_ == 0
     zero_features = regressor.columns[zero_mask]
     non_zero_features = regressor.columns[~zero_mask]
 
-    print("Alpha selected via cross-validation:", model.alpha_)
-    print("Zero-coefficient features:")
+    print("Alpha selected via cross-validation:", round(model.alpha_, 13))
+    print("List of Zero-coefficient features:")
     print(list(zero_features))
-    print("Non-zero-coefficient features:")
+    print("List of Non-zero-coefficient features:")
     print(list(non_zero_features))
     print("L2 norm of coefficients:", np.linalg.norm(model.coef_, 2))
+    print("-" * 30)
 
-lasso_with_eps(1e-11, 0)
+lasso_with_eps(1e-12, 0)
 lasso_with_eps(1e-3, 1)
 plt.tight_layout()
 plt.show()
 ```
 
+alter Text:
+
+If the standard automatic alpha selection procedure is used (see (b)), it uses the the default epsilon value of 1e-3, which is relatively large. In that case, the selected alpha is much larger than with a smaller epsilon, which leads to more aggressive regularization and more coefficients being pushed to zero. 
+The features: 'bedrooms', 'host_is_superhost', 'Shared_bath_status', 'instant_bookable', 'distance_center'are being set at zero.
+For the Minimum of the Average MSE to show, eps must be set to a the value of ~1e-12 (see (a)). This results in a very small alpha, which is the regalurization strength. The small alpha indicates that the model is very close to an OLS regression, which is consistent with the fact that the lasso coefficients are not heavily shrunk towards zero. The fact that some coefficients are exactly zero suggests that the lasso has identified certain features as less relevant for predicting the outcome, while still allowing other features to have non-zero coefficients. The extension to eps=1e-12 would result therefore in zero "Zero-coefficients" and only Non-zero coefficients. The model is thus very close to an OLS regression, without any significant regularization effect. This is consistent with the fact that the l_2-norm of the coefficients is not much smaller than that of the OLS model, indicating that the coefficients are not heavily shrunk towards zero.
+
 With a very small epsilon, the selected alpha is also very small, so the Lasso solution stays close to OLS. In that case the regularization effect is weak and only limited coefficient shrinkage occurs. This suggests that the data do not strongly support a sparse model in which many predictors should be pushed exactly to zero.
+
+Erics neuer Text:
+
+The choice of epsilon in LassoCV directly affects the selected regularization strength α and therefore the resulting model. With the default setting (epsilon = 1e−3), the selected α is relatively large, which leads to strong regularization. In this case, several coefficients are pushed exactly to zero, specifically bedrooms, host_is_superhost, Shared_bath_status, instant_bookable, and distance_center, resulting in a sparse model that retains only a small subset of predictors.
+
+When ε is reduced to a very small value (around 1e−12), the selected α becomes extremely small. As a result, Lasso behaves almost identically to OLS: coefficients are barely shrunk, no variables are eliminated, and the l_2-norm remains close to the OLS solution. This indicates that there is effectively no regularization.
+
+In comparison, OLS includes all variables without any shrinkage, while Ridge reduces coefficient magnitudes as lambda increases but never sets them to zero. Lasso differs in that it can both shrink coefficients and eliminate variables entirely. Overall, the results show that Lasso transitions from an OLS-like model without sparsity to a sparse model with variable selection as the regularization strength increases, with epsilon indirectly controlling this behavior through its influence on α.
+
+For the Minimum of the Average MSE to show, eps must be set to a the value of ~1e-12. This results in a very small alpha, which is the regalurization strength. The small alpha indicates that the model is very close to an OLS regression, which is consistent with the fact that the lasso coefficients are not heavily shrunk towards zero. The fact that some coefficients are exactly zero suggests that the lasso has identified certain features as less relevant for predicting the outcome, while still allowing other features to have non-zero coefficients. The extension to eps=1e-12 would result therefore in zero "Zero-coefficients" and only Non-zero coefficients.
 
 ```{python}
 #Aufgabe 2_6
@@ -734,8 +733,9 @@ print("Average RMSE Lasso:", np.mean(rmse_lasso))
 
 The cross-validated RMSE values are close to each other, but Lasso performs somewhat worse in this setting. This fits the structure of the problem: the predictor set is not especially sparse, so forcing coefficients toward zero can remove useful information. OLS and Ridge are therefore more natural benchmarks here, while Lasso is less attractive for prediction.
 
+
 Task 2.7:
-The regression results suggest that listing size and quality are central for pricing. Listings that accommodate more guests, offer more bedrooms and bathrooms, and provide more amenities tend to be more expensive. Location also matters: being closer to the city centre is generally associated with higher prices. In addition, host-related features such as superhost status and instant booking appear to be linked to a price premium, although these effects are smaller than the effects of size and location. For a new host, the main advice would be to benchmark the listing against similar nearby properties and then adjust for concrete characteristics such as capacity, equipment, and booking convenience. A host should not simply copy the average market price. Instead, pricing should reflect the local area, the size of the apartment, and the quality of the offering. Small improvements in presentation and amenities may justify a moderate premium, but large pricing mistakes are more likely to come from ignoring location and listing size.
+The regression results suggest that listing size and quality are central for pricing. Listings that accommodate more guests, offer more bedrooms and bathrooms, and provide more amenities tend to be more expensive. Location also matters: being closer to the city centre is generally associated with higher prices. In addition, host-related features such as superhost status and instant booking appear to be linked to a price premium, although these effects are smaller than the effects of size and location. For a new host, the main advice would be to benchmark the listing against similar nearby properties and then adjust for concrete characteristics such as capacity, equipment, and booking convenience. A host should not simply copy the average market price. Instead, pricing should reflect the local area and the quality of the offering. Small improvements in presentation and amenities may justify a moderate premium, but large pricing mistakes are more likely to come from ignoring location and listing size.
 
 ```{python}
 # Task 2.8
@@ -743,6 +743,8 @@ model_2_8 = sm.QuantReg(outcome, regressor)
 res_2_8 = model_2_8.fit(q=0.5)
 res_2_8.summary().tables[1]
 ```
+
+The largest differences between the OLS and quantile regression estimates are observed for distance to the city centre, which shows a substantially stronger negative effect in the median regression. Smaller but noticeable differences also appear for accommodates and bathrooms, which have slightly larger coefficients in the quantile model. In contrast, most other coefficients remain very similar across the two specifications. Importantly, the statistical significance of all variables remains unchanged: all coefficients are highly significant in both models, and their signs are consistent. This suggests that the main relationships are robust, although the strength of some effects varies depending on whether the mean or the median of the price distribution is considered.
 
 ```{python}
 # Task 2.9

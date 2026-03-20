@@ -970,80 +970,73 @@ plt.legend(handles=[patch0, patch1])
 plt.show()
 ```
 
-```{python}
-Y = y
-pen = 'l2'
-solv = 'liblinear'
-# Create color maps.
-cmap_light = ListedColormap(['#FFAAAA', '#AAAAFF'])
-cmap_bold = ListedColormap(['#FF0000', '#0000FF'])
-
-mesh_step_size = .01
-plot_symbol_size = 50
-
-x_min, x_max = X[:, 0].min(), X[:, 0].max()
-y_min, y_max = X[:, 1].min(), X[:, 1].max()
-xx, yy = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
-                     np.arange(y_min, y_max, mesh_step_size))
-Z = model_3_5_1.predict(np.c_[xx.ravel(), yy.ravel()])
-D = model_3_5_1.decision_function(np.c_[xx.ravel(), yy.ravel()])
-D = D.reshape(xx.shape)
-
-Z = Z.reshape(xx.shape)
-plt.figure(3, figsize=(9, 6))
-plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
-
-plt.scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y, cmap=cmap_bold, edgecolor='black')
-plt.xlim(xx.min(), xx.max())
-plt.ylim(yy.min(), yy.max())
-
-patch0 = mpatches.Patch(color='#FF0000', label='Y=0')
-patch1 = mpatches.Patch(color='#0000FF', label='Y=1')
-plt.legend(handles=[patch0, patch1])
-plt.contour(xx, yy, D, levels=[0], colors='w', linestyles=['-'], linewidths=2)
-plt.xlabel('debt_to_income')
-plt.ylabel('credit_utilization')
-plt.title("Two-class classification with logistic regression")
-plt.show()
-```
 
 ```{python}
-from sklearn import svm
-supvecma = svm.SVC(kernel='rbf', C=3)
-model_3_5_2 = supvecma.fit(X, Y)
-print('Error rate:', np.mean(np.not_equal(model_3_5_2.predict(X), y)))
+import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import matplotlib.patches as mpatches
+from sklearn import svm
+
 Y = y
 
-cmap_light2 = ListedColormap(['#FFAAAA', '#AAAAFF'])
-cmap_bold2 = ListedColormap(['#FF0000', '#0000FF'])
 
-mesh_step_size = .01
+cmap_light = ListedColormap(['#FFAAAA', '#AAAAFF'])
+cmap_bold  = ListedColormap(['#FF0000', '#0000FF'])
+
+mesh_step_size = 0.01
 plot_symbol_size = 50
 
 x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
 y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
-xx, y_grid = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
-                         np.arange(y_min, y_max, mesh_step_size))
-Z = model_3_5_2.predict(np.c_[xx.ravel(), y_grid.ravel()])
-D = model_3_5_2.decision_function(np.c_[xx.ravel(), y_grid.ravel()])
-D = D.reshape(xx.shape)
-Z = Z.reshape(xx.shape)
+xx, yy = np.meshgrid(np.arange(x_min, x_max, mesh_step_size),
+                     np.arange(y_min, y_max, mesh_step_size))
 
-plt.figure(3, figsize=(9, 6))
-plt.pcolormesh(xx, y_grid, Z, cmap=cmap_light2)
-plt.scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y, cmap=cmap_bold2, edgecolor='black')
-plt.xlim(xx.min(), xx.max())
-plt.ylim(y_grid.min(), y_grid.max())
+fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+# Logistic Regression
+Z_lr = model_3_5_1.predict(np.c_[xx.ravel(), yy.ravel()])
+D_lr = model_3_5_1.decision_function(np.c_[xx.ravel(), yy.ravel()])
+Z_lr = Z_lr.reshape(xx.shape)
+D_lr = D_lr.reshape(xx.shape)
+
+axes[0].pcolormesh(xx, yy, Z_lr, cmap=cmap_light)
+axes[0].scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y,
+                cmap=cmap_bold, edgecolor='black')
+axes[0].contour(xx, yy, D_lr, levels=[0], colors='w', linewidths=2)
+
+axes[0].set_title("Logistic Regression")
+axes[0].set_xlabel('debt_to_income')
+axes[0].set_ylabel('credit_utilization')
+axes[0].set_xlim(xx.min(), xx.max())
+axes[0].set_ylim(yy.min(), yy.max())
+
+# SVM
+supvecma = svm.SVC(kernel='rbf', C=3)
+model_3_5_2 = supvecma.fit(X, Y)
+
+print('Error rate:', np.mean(np.not_equal(model_3_5_2.predict(X), y)))
+
+Z_svm = model_3_5_2.predict(np.c_[xx.ravel(), yy.ravel()])
+D_svm = model_3_5_2.decision_function(np.c_[xx.ravel(), yy.ravel()])
+Z_svm = Z_svm.reshape(xx.shape)
+D_svm = D_svm.reshape(xx.shape)
+
+axes[1].pcolormesh(xx, yy, Z_svm, cmap=cmap_light)
+axes[1].scatter(X[:, 0], X[:, 1], s=plot_symbol_size, c=Y,
+                cmap=cmap_bold, edgecolor='black')
+axes[1].contour(xx, yy, D_svm, levels=[0], colors='w', linewidths=2)
+
+axes[1].set_title("SVM (RBF kernel, C=3)")
+axes[1].set_xlabel('debt_to_income')
+axes[1].set_ylabel('credit_utilization')
+axes[1].set_xlim(xx.min(), xx.max())
+axes[1].set_ylim(yy.min(), yy.max())
 
 patch0 = mpatches.Patch(color='#FF0000', label='Y=0')
 patch1 = mpatches.Patch(color='#0000FF', label='Y=1')
-plt.legend(handles=[patch0, patch1])
-plt.contour(xx, y_grid, D, levels=[0], colors='w', linestyles=['-'], linewidths=2)
-plt.xlabel('debt_to_income')
-plt.ylabel('credit_utilization')
-plt.title("Classification with an RBF-SVM")
+fig.legend(handles=[patch0, patch1], loc='upper right')
+
+plt.tight_layout()
 plt.show()
 ```
 

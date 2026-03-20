@@ -1049,13 +1049,28 @@ plt.show()
 ```{python}
 # Task 3.6
 
+#Aufgabe 3_6
+
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-randforest = RandomForestClassifier(max_depth=5, random_state=0)
-model_3_6 = randforest.fit(X_train, y_train.values.ravel())
-print("Error rate:", np.mean(model_3_6.predict(X_train) != y_train.values.ravel()))
-importance = pd.DataFrame([model_3_6.feature_importances_], index=["importance"], columns=X_train.columns).T.sort_values(by="importance", ascending=False)
-importance.head()
+def rand_for_var(n_estimat, max_dep):
+    randforest = RandomForestClassifier(max_depth=max_dep, random_state=0, n_estimators=n_estimat)
+    model_3_6 = randforest.fit(X_train, y_train.values.ravel())
+    print("Error rate:", np.mean(model_3_6.predict(X_train) != y_train.values.ravel()))
+    importance=pd.DataFrame([model_3_6.feature_importances_],index=["importance"], columns=X_train.columns).T.sort_values(by="importance", ascending=False)
+    return importance.head()
+
+for n in [1, 10, 100]:
+    print("-"*30)
+    print(f"n_estimators = {n}")
+    print(rand_for_var(n, 5))
+
+for max in [5, 20, 50]:
+    print("-"*30)
+    print(f"max_depth = {max}")
+    print(rand_for_var(10, max))
+
+
 ```
 
 The leading variables from the random forest importance ranking are broadly in line with the earlier logistic-regression results, even if the exact order differs. This is reassuring because two different model classes point to a similar set of important predictors.

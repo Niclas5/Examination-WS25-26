@@ -235,7 +235,8 @@ listings_1_9 = listings_1_5.copy()
 
 fig, ax = plt.subplots(2, 2, figsize=(11, 7), dpi=200)
 
-sns.violinplot(data=listings_1_9, x="room_type", y="price", hue="Shared_bath_status", log_scale=True, split=True, ax=ax[0,0])
+sns.boxplot(data=listings_1_9, x="room_type", y="price", hue="Shared_bath_status", showfliers=False, log_scale=True, ax=ax[0,0])
+sns.stripplot(data=listings_1_9, x="room_type", y="price", hue="Shared_bath_status", dodge=True, palette="dark:black", alpha=0.3, size=2, log_scale=True, ax=ax[0,0], legend=False)
 ax[0,0].set_title("Price distribution by room type and shared bath status", fontsize=10)
 ax[0,0].set_xlabel("room type", fontsize=10)
 ax[0,0].set_ylabel("price (log scale)", fontsize=10)
@@ -273,65 +274,11 @@ plt.tight_layout()
 plt.show()
 ```
 
-```{python}
-print("Hotel room shared bath rate:",(listings_1_9.loc[listings_1_9["room_type"]=="Hotel room"]["Shared_bath_status"]==True).mean())
-print("Private room shared bath rate:",(listings_1_9.loc[listings_1_9["room_type"]=="Private room"]["Shared_bath_status"]==True).mean())
-```
 
-!!!!!!!!!!!!!!!!!!
+The first plot shows large price differences across room types. Shared rooms are clearly the cheapest, private rooms come next, and entire homes or hotel rooms tend to be more expensive. Shared bathrooms are optionally available for private rooms and hotel rooms, and listings with shared bathrooms are usually priced lower for private rooms. Hotel rooms with a shared bath show a higher median price than those with private ones, however the sample size for hotelrooms and those with shared bathrooms specifically is very low, so a general trend should not be derived. The second plot suggests that both superhost status and instant booking are associated with higher prices. The pattern is visible in both boxplots, although the differences are not equally strong.
+The third plot shows a clear positive relationship between the number of accommodated guests and price. Larger listings are generally more expensive. The fourth plot portrais the dataset in relation to price and the number of items listed in the amenities section. Throughout the cluster, a positive relation can be observed, backed up by the robust regression line. Additionaly the figure shows that superhosts tend to list more amenities. A superhost premium beyond the regressed amenities related price increase is not clearly visible.
 
-The first plot shows large price differences across room types. Shared rooms are clearly the cheapest, private rooms come next, and entire homes or hotel rooms tend to be more expensive. Shared bathrooms are optionally available for private rooms and hotel rooms, and listings with shared bathrooms are usually priced lower for private rooms. Unexpectatly, hotel rooms with a shared bath have a higher median price than those with private ones. It should be noted however, that only 5.5% of hotel rooms have a shared bathroom setup, compared to 56.9% of private rooms. Thus the validity of that trend suffers from a lower sample size, which the violin plot misleadingly portrais as similar to it's counterpart's. 
-
-!!!!!!!!!!!!!!!!!!
-
-The first plot shows that there are four types of bookables listed on AirBnB. Shared rooms make up the cheapest available type of rental unit with the lowest positioned distribution, followed by the private rooms and then apartments, with hotel rooms tending to be the most expensive. Logically, only private rooms and hotel rooms are optionally available with a shared bathroom, with apartments never and shared rooms only having them. As could be expected, shared room type AirBnBs tend to be cheaper than those with private bathrooms. Unexpectatly, hotel rooms with a shared bath have a higher median price than those with private ones. It should be noted however, that only 5.5% of hotel rooms have a shared bathroom setup, compared to 56.9% of private rooms. Thus the validity of that trend suffers from a lower sample size, which the violin plot misleadingly portrais as similar to it's counterpart's. 
-
-The second plot suggests that both superhost status and instant booking are associated with higher prices. The pattern is visible in both boxplots, although the differences are not equally strong.
-
-The third plot shows a clear positive relationship between the number of accommodated guests and price. Larger listings are generally more expensive.
-
-The fourth plot indicates a positive relationship between the number of amenities and price. The trend is not perfect, but the fitted line points upward, which suggests that more heavily equipped listings tend to charge more.
-
-The fourth plot portrais the dataset in relation to price and the number of items listed in the amenities section. Throughout the cluster, a slight but meaningful positive correlation can be observed, backed up by the robust regression line. Additionaly the figure shows that superhosts tend to list more amenities. A superhost premium beyond the regressed amenities related price increase is not clearly visible in the plot.
-
-
-```{python}
-# Optional extra plots for Section 1
-# These plots are less central for the final discussion but still useful for exploration.
-
-fig, ax = plt.subplots(2, 2, figsize=(11, 7), dpi=200)
-
-sns.scatterplot(data=listings_1_9, x="review_scores_rating", y="number_of_reviews", ax=ax[0,0], alpha=0.5, hue="host_is_superhost", palette="colorblind")
-ax[0,0].set_title("Review scores vs. number of reviews", fontsize=10)
-ax[0,0].set_yscale("log")
-ax[0,0].set_xlabel("review scores", fontsize=10)
-ax[0,0].set_ylabel("number of reviews (log scale)", fontsize=10)
-
-sns.scatterplot(data=listings_1_9, x=listings_1_9.loc[(listings_1_9["review_scores_rating"] >= 4.0)]["review_scores_rating"], y="price", ax=ax[0,1], alpha=0.5, hue="host_is_superhost", palette="colorblind")
-ax[0,1].set_yscale("log")
-ax[0,1].set_title("Price vs. review scores (>= 4.0)", fontsize=10)
-ax[0,1].set_xlabel("review scores (>= 4.0)", fontsize=10)
-ax[0,1].set_ylabel("price (log scale)", fontsize=10)
-
-sns.stripplot(data=listings_1_9.loc[(listings_1_9["bedrooms"] <= 7)], x="bedrooms", y="price", ax=ax[1,0], alpha=0.5, log_scale=True, hue="instant_bookable", palette="colorblind", dodge=True, jitter=0.2, zorder=1)
-sns.boxplot(data=listings_1_9.loc[(listings_1_9["bedrooms"] <= 7)], x="bedrooms", y="price", ax=ax[1,0], log_scale=True, palette="dark:black", fill=False, showfliers=False, hue="instant_bookable", dodge=True, zorder=10)
-ax[1,0].set_title("Price distribution by bedrooms (<= 7)", fontsize=10)
-ax[1,0].set_xlabel("bedrooms", fontsize=10)
-ax[1,0].set_ylabel("price (log scale)", fontsize=10)
-
-sns.stripplot(data=listings_1_9.loc[(listings_1_9["bathrooms_number"] <= 3)], x="bathrooms_number", y="price", ax=ax[1,1], alpha=0.5, log_scale=True, hue="instant_bookable", palette="colorblind", dodge=True, jitter=0.2, zorder=1)
-sns.boxplot(data=listings_1_9.loc[(listings_1_9["bathrooms_number"] <= 3)], x="bathrooms_number", y="price", ax=ax[1,1], log_scale=True, fill=False, palette="dark:black", showfliers=False, hue="instant_bookable", dodge=True, zorder=10)
-ax[1,1].set_title("Price distribution by bathrooms (<= 3)", fontsize=10)
-ax[1,1].set_xlabel("bathrooms", fontsize=10)
-ax[1,1].set_ylabel("price (log scale)", fontsize=10)
-
-for a in ax.flatten():
-    a.grid(alpha=0.3)
-
-plt.tight_layout()
-plt.show()
-```
-
+Task 1.10:
 The Berlin Airbnb market shows a clear price gradient across listing characteristics. Room type is one of the strongest factors: shared rooms are cheapest, while entire homes and hotel rooms are more expensive. Capacity also matters a lot, since listings for more guests tend to have substantially higher prices. In addition, listings with more amenities are usually more expensive, which suggests that quality and equipment are reflected in pricing. Superhost status and instant booking also seem to be associated with a price premium, although these effects are less pronounced than room type or capacity. Spatially, central areas often combine high listing density with comparatively high prices, but the relationship is not perfect. Some peripheral regions also show high median prices, likely because they contain fewer listings and are therefore more sensitive to individual outliers. Overall, listing size, type, amenities, and location seem to matter most for prices.
 
 
@@ -339,7 +286,9 @@ The Berlin Airbnb market shows a clear price gradient across listing characteris
 # Task 1.11: match region information from the Airbnb data to the GeoJSON data
 
 import json
-import re
+import re   # We import re to check for and remove inconsistent whitespaces. 
+
+# We load the geojson file:
 
 with open("../Daten/berlin_bezirke.geojson", "r", encoding="utf-8") as f:
     berlin_geojson = json.load(f)
@@ -353,7 +302,7 @@ geo_df = pd.DataFrame({"region_geo": bzr_names})
 airbnb_regions = listings_1_9["neighbourhood_cleansed"].unique()
 airbnb_df = pd.DataFrame({"region_airbnb": airbnb_regions})
 
-def clean_region(name):
+def clean_region(name):      # We define a cleaning function to normalize the names of both sets
     name = name.lower()
     name = name.replace("str.", "strasse")
     name = name.replace("-", " ")
@@ -372,20 +321,21 @@ def clean_region(name):
 geo_df["clean_name"] = geo_df["region_geo"].apply(clean_region)
 airbnb_df["clean_name"] = airbnb_df["region_airbnb"].apply(clean_region)
 
+# We check for perfect matches after applying the cleaning function:
+
 auto_matches = set(geo_df["clean_name"]) & set(airbnb_df["clean_name"])
 mapping_auto = {name: name for name in auto_matches}
-mapping_auto_v2 = {
+mapping_auto_v2 = {     # We map the original names of the matches
     airbnb_df.loc[airbnb_df["clean_name"] == name]["region_airbnb"].iloc[0]:
     geo_df.loc[geo_df["clean_name"] == name]["region_geo"].iloc[0]
     for name in auto_matches
 }
-
 remaining_airbnb = set(airbnb_df["clean_name"]) - set(mapping_auto.keys())
 remaining_geo = set(geo_df["clean_name"]) - set(mapping_auto.values())
-print("Remaining Airbnb regions:", sorted(remaining_airbnb))
-print("Remaining GeoJSON regions:", sorted(remaining_geo))
+print("Remaining Airbnb regions:", sorted(remaining_airbnb)[:3])
+print("Remaining GeoJSON regions:", sorted(remaining_geo)[:3])
 
-# For the unmatched names below, we use a manual mapping after checking the cleaned names.
+# For the unmatched names below, we use a manual mapping after checking the cleaned names with the help of AI. The remaining unmatched regions mostly relate to the geojson beeing more specific than airbnb. We told the AI to match airbnb_region => specific geojson_subregion, prioritizing "nord" and "ost".
 mapping_manual = {
     "friedenau": "friedenau ost",
     "gropiusstadt": "gropiusstadt ost",
@@ -399,18 +349,16 @@ mapping_manual = {
     "schöneberg süd": "schöneberg südost",
     "kölln. vorstadt": "köllnische vorstadt",
 }
-
-mapping_manual_v2 = {
+mapping_manual_v2 = {   # We map the original names together.
     airbnb_df.loc[airbnb_df["clean_name"] == name_a]["region_airbnb"].iloc[0]:
     geo_df.loc[geo_df["clean_name"] == name_g]["region_geo"].iloc[0]
     for name_a, name_g in mapping_manual.items()
 }
-
 mapping = {**mapping_auto_v2, **mapping_manual_v2}
-print(mapping)
+print(sorted(mapping)[:4])
 ```
 
-A few unmatched regions remain after the name-based matching. In principle, these cases can be handled more reliably by using the listing coordinates and assigning each point directly to its geographic polygon. This is the better approach because it does not depend on naming conventions.
+A few unmatched regions remain after the name-based matching. In principle, these cases can be handled more reliably by using the listing coordinates and assigning each point directly to its geographic polygon. This is the better approach because it does not depend on matching different naming conventions.
 
 ```{python}
 import geopandas as gpd
@@ -445,6 +393,7 @@ listings_1_11.head()
 ```{python}
 # Task 1.12
 
+# For the following analysis and regression tasks, we exclude the outliers by implementing the 99% upper bound that was defined in task 1.6.
 listings_1_12 = listings_1_11.loc[listings_1_11["price"] < upper_bound].copy()
 
 region_stats = (
@@ -491,7 +440,7 @@ for trace in scatter.data:
     fig.add_trace(trace)
     fig.update_traces(marker=dict(size=5, opacity=0.5), selector=dict(mode='markers'))
 
-fig.update_layout(height=550, margin=dict(l=0, r=0, t=50, b=0), legend={"x": 0.94, "y": 1})
+fig.update_layout(height=550, margin=dict(l=0, r=0, t=50, b=0), legend={"x": 0.9, "y": 1})
 fig.show()
 ```
 
@@ -522,10 +471,6 @@ fig.show()
 Listing density is clearly highest in central Berlin. The density map shows a strong concentration of Airbnb activity near the inner city, while most outer areas have far fewer listings per square kilometer. The price map points in a similar direction, but the pattern is less uniform. Central areas are often expensive, yet some peripheral regions also show high median prices. These cases should be interpreted carefully, because regions with only a small number of listings are more affected by individual high-price observations.
 
 Taken together, the maps suggest that centrality matters for both density and price, but more strongly for density. Proximity to major attractions, public transport, and established urban neighborhoods likely explains why the centre dominates the market. At the same time, local factors such as neighborhood image, housing type, or small sample sizes can create high-price pockets outside the centre.
-
-The following markdown cell was kept in the original notebook as a draft note. The final interpretation is given in the previous cell.
-
-The maps suggest a clear centre–periphery pattern. Listing density is much higher in central Berlin than in the outer parts of the city. This is plausible because central areas are closer to tourist attractions, nightlife, restaurants, and major transport links. Median prices also tend to be higher in the centre, but the pattern is less clean than for density. Some non-central Bezirksregionen show relatively high median prices as well. These values should be read carefully, since they may be driven by a limited number of listings rather than a broad market pattern. Overall, centrality seems to matter strongly for where Airbnb listings are concentrated, while prices are shaped by a mix of location, local demand, and listing-specific features such as size and amenities.
 
 ```{python}
 listings_1_13.to_csv("listings_1_13.csv")

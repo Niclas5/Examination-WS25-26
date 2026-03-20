@@ -155,7 +155,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-The histogram on the linear scale is heavily dominated by a small number of very expensive listings, so most of the distribution is compressed into a narrow range. The logarithmic version is more informative because it spreads out the lower and middle price ranges and makes the overall shape easier to read.
+When based on the full dataset, the histogramm on both the linear and the log scale are heavily dominated by outliers. The main body of the distribution would be compressed into such a narrow range, that an analysis becomes impossible. We chose to bypass that issue by introducing an upper bound to the price variable in our dataset. We calculated the bound to include 99% of listings based on the assumption of a log normal distribution. The resulting plots comfirm this assumption, as the log scale plot ist roughly normally distributed, while the linear scale plot is heavily right-skewed.
 
 For later statistical analysis, the logarithmic representation is the better choice. Prices appear roughly log-normal, and the log scale reduces the influence of extreme values. This makes the distribution more stable and better suited for regression-based work.
 
@@ -206,6 +206,8 @@ print("The trimmed mean is lower because a small number of very expensive listin
 ```
 
 ```{python}
+#To make the information in the amenities column available to our analysis, we transform the list like string entries to real python lists using the ast library. 
+#The existence of a dedicated function with this purpose within the ast library was brought to our attention by AI. 
 import ast
 
 # Parse the amenities column from string representation to a Python list.
@@ -217,12 +219,10 @@ def clean_amenities(amenities_str):
         return [a.strip() for a in amenities if isinstance(a, str)]
     except (ValueError, SyntaxError):
         return []
-
+# We apply the function to our dataset and calculate the number of entries per list. 
 listings_1_8["amenities_list"] = listings_1_8["amenities"].apply(clean_amenities)
 listings_1_8["amenities_count"] = listings_1_8["amenities_list"].apply(len)
-listings_1_8[["amenities", "amenities_list", "amenities_count"]].head()
-
-print(listings_1_8["amenities_count"].sum())
+listings_1_8[["amenities", "amenities_list", "amenities_count"]].head(3)
 ```
 
 ```{python}

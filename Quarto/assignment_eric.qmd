@@ -779,6 +779,8 @@ print("Average RMSE Lasso:", np.mean(rmse_lasso))
 OLS and Ridge achieve nearly identical out-of-sample performance, indicating that regularization does not improve predictive accuracy. Lasso performs substantially worse due to aggressive variable selection, which removes relevant predictors and leads to underfitting.
 The inferior performance of Lasso indicates that the underlying model is not sparse. Many predictors contribute to the outcome, so enforcing sparsity removes relevant information and increases prediction error. In contrast, OLS and Ridge retain all variables, which better reflects the data structure.
 
+The inferior performance of Lasso indicates that the underlying model is not sparse. Many predictors contribute to the outcome, so enforcing sparsity removes relevant information and increases prediction error. In contrast, OLS and Ridge retain all variables, which better reflects the data structure
+
 ```{python}
 # Task 2.8
 model_2_8 = sm.QuantReg(outcome, regressor)
@@ -856,6 +858,9 @@ print(coef_df.head(3))
 ```
 
 After standardization, the coefficients can be compared more directly because all variables are measured on the same scale. A positive coefficient indicates that higher values of the feature are associated with a higher probability of default, while a negative coefficient points in the opposite direction. The variables with the largest absolute coefficients are therefore the strongest predictors in the logistic model.
+
+The features with the largest absolute coefficients are debt_to_income, credit_utilization, and previous_defaults. They indicate that default risk is mainly driven by a borrower’s financial burden, current credit usage, and past behavior. A high debt-to-income ratio is the strongest predictor, suggesting that individuals with higher relative debt are much more likely to default. High credit utilization further increases risk by indicating financial strain, while previous defaults highlight that past repayment behavior is a strong indicator of future default.
+
 
 
 ```{python}

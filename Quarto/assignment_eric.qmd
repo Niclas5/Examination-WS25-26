@@ -699,7 +699,7 @@ def lasso_with_eps(epsilon, x_ax):
 
     print("Lasso coefficients:")
     print(model.coef_)
-
+    print("Eps:", model.eps)
 
     m_log_alphas = -np.log10(model.alphas_)
     ax[x_ax].plot(m_log_alphas, model.mse_path_, ':')
@@ -736,10 +736,12 @@ plt.tight_layout()
 plt.show()
 ```
 
-If the standard automatic alpha selection procedure is used (see (b)), it uses the the default epsilon value of 1e-3, which is relatively large. In that case, the selected alpha is much larger than with a smaller epsilon, which leads to more aggressive regularization and more coefficients being pushed to zero. 
-The features: 'bedrooms', 'host_is_superhost', 'Shared_bath_status', 'instant_bookable', 'distance_center'are being set at zero.
-For the Minimum of the Average MSE to show, eps must be set to a the value of ~1e-12 (see (a)). This results in a very small alpha, which is the regalurization strength. The small alpha indicates that the model is very close to an OLS regression, which is consistent with the fact that the lasso coefficients are not heavily shrunk towards zero. The fact that some coefficients are exactly zero suggests that the lasso has identified certain features as less relevant for predicting the outcome, while still allowing other features to have non-zero coefficients. The extension to eps=1e-12 would result therefore in zero "Zero-coefficients" and only Non-zero coefficients. The model is thus very close to an OLS regression, without any significant regularization effect. This is consistent with the fact that the l_2-norm of the coefficients is not much smaller than that of the OLS model, indicating that the coefficients are not heavily shrunk towards zero.
-With a very small epsilon, the selected alpha is also very small, so the Lasso solution stays close to OLS. In that case the regularization effect is weak and only limited coefficient shrinkage occurs. This suggests that the data do not strongly support a sparse model in which many predictors should be pushed exactly to zero.
+The choice of epsilon in LassoCV directly affects the selected regularization strength α and therefore the resulting model. With the default setting (epsilon = 1e−3), the selected α is relatively large, which leads to strong regularization. In this case, several coefficients are pushed exactly to zero, specifically bedrooms, host_is_superhost, Shared_bath_status, instant_bookable, and distance_center, resulting in a sparse model that retains only a small subset of predictors.
+
+When ε is reduced to a very small value (around 1e−12), the selected α becomes extremely small. As a result, Lasso behaves almost identically to OLS: coefficients are barely shrunk, no variables are eliminated, and the l_2-norm remains close to the OLS solution. This indicates that there is effectively no regularization.
+
+In comparison, OLS includes all variables without any shrinkage, while Ridge reduces coefficient magnitudes as lambda increases but never sets them to zero. Lasso differs in that it can both shrink coefficients and eliminate variables entirely. Overall, the results show that Lasso transitions from an OLS-like model without sparsity to a sparse model with variable selection as the regularization strength increases, with epsilon indirectly controlling this behavior through its influence on α.
+
 
 ```{python}
 #Aufgabe 2_6
@@ -774,9 +776,8 @@ print("Average RMSE Ridge:", np.mean(rmse_ridge))
 print("Average RMSE Lasso:", np.mean(rmse_lasso))
 ```
 
-The cross-validated RMSE values are close to each other, but Lasso performs somewhat worse in this setting. This fits the structure of the problem: the predictor set is not especially sparse, so forcing coefficients toward zero can remove useful information. OLS and Ridge are therefore more natural benchmarks here, while Lasso is less attractive for prediction.
-
-The regression results suggest that listing size and quality are central for pricing. Listings that accommodate more guests, offer more bedrooms and bathrooms, and provide more amenities tend to be more expensive. Location also matters: being closer to the city centre is generally associated with higher prices. In addition, host-related features such as superhost status and instant booking appear to be linked to a price premium, although these effects are smaller than the effects of size and location. For a new host, the main advice would be to benchmark the listing against similar nearby properties and then adjust for concrete characteristics such as capacity, equipment, and booking convenience. A host should not simply copy the average market price. Instead, pricing should reflect the local area, the size of the apartment, and the quality of the offering. Small improvements in presentation and amenities may justify a moderate premium, but large pricing mistakes are more likely to come from ignoring location and listing size.
+OLS and Ridge achieve nearly identical out-of-sample performance, indicating that regularization does not improve predictive accuracy. Lasso performs substantially worse due to aggressive variable selection, which removes relevant predictors and leads to underfitting.
+The inferior performance of Lasso indicates that the underlying model is not sparse. Many predictors contribute to the outcome, so enforcing sparsity removes relevant information and increases prediction error. In contrast, OLS and Ridge retain all variables, which better reflects the data structure.
 
 ```{python}
 # Task 2.8

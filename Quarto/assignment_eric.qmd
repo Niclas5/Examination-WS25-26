@@ -684,6 +684,11 @@ for lam in lambdas:
     print(f"||beta||_2 (l2 norm): {norm:.6f}")
     print(f"Coefficients (excerpt): {beta_hat[:3]}")
     print("-" * 30)
+
+
+#For this task, we made more extensive use of AI-based assistance due to initial difficulties in implementing the required approach. The AI support was used to better understand the methodology and guide the implementation process.
+
+#All results, interpretations, and final code were reviewed, adapted, and validated by us. We ensured full comprehension of the applied methods and take responsibility for the presented work. The use of AI served as a learning aid rather than a substitute for our own contribution.
 ```
 
 
